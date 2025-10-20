@@ -529,13 +529,15 @@
                                 <th style="width: 60px;">번호</th>
                                 <th>이메일</th>
                                 <th>닉네임</th>
+                                <th style="width: 80px;">IP비교</th>
+                                <th style="width: 120px;">만료일</th>
                                 <th style="width: 100px;">상태</th>
                                 <th style="width: 150px;">관리</th>
                             </tr>
                         </thead>
                         <tbody id="basic-tbody">
                             <tr>
-                                <td colspan="5" style="text-align: center; color: #999;">로딩 중...</td>
+                                <td colspan="7" style="text-align: center; color: #999;">로딩 중...</td>
                             </tr>
                         </tbody>
                     </table>
@@ -751,11 +753,40 @@
             document.getElementById('basic-tbody').innerHTML = filteredUsers.map((user, index) => {
                 // 전체 사용자 목록에서의 실제 인덱스 찾기
                 const actualIndex = sortedAllUsers.findIndex(u => u.id === user.id);
+                
+                // IP 비교 로직
+                let ipComparison = '';
+                if (user.signupIP === 'unknown' || user.lastLoginIP === 'N/A') {
+                    ipComparison = '<span style="color: #999;">-</span>';
+                } else if (user.signupIP === user.lastLoginIP) {
+                    ipComparison = '<span style="color: #28a745; font-weight: bold;">같음</span>';
+                } else {
+                    ipComparison = '<span style="color: #dc3545; font-weight: bold;">다름</span>';
+                }
+                
+                // 만료일 표시
+                let expiryDisplay = '-';
+                if (user.expiryDate) {
+                    const expiryTime = new Date(user.expiryDate);
+                    const now = new Date();
+                    const daysRemaining = Math.ceil((expiryTime - now) / (1000 * 60 * 60 * 24));
+                    
+                    if (daysRemaining < 0) {
+                        expiryDisplay = '<span style="color: red; font-weight: bold;">만료</span>';
+                    } else if (daysRemaining <= 7) {
+                        expiryDisplay = `<span style="color: orange; font-weight: bold;">${daysRemaining}일</span>`;
+                    } else {
+                        expiryDisplay = `<span style="color: #666;">${daysRemaining}일</span>`;
+                    }
+                }
+                
                 return `
                 <tr>
                     <td style="text-align: center;">${totalCount - actualIndex}</td>
                     <td>${user.email}</td>
                     <td>${user.nickname || '-'}</td>
+                    <td style="text-align: center;">${ipComparison}</td>
+                    <td style="text-align: center;">${expiryDisplay}</td>
                     <td><span class="status ${user.status}">${getStatusText(user.status)}</span></td>
                     <td>
                         ${user.status === 'suspended' 
