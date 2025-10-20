@@ -498,6 +498,10 @@
                     <p>승인 완료</p>
                 </div>
                 <div class="stat-card">
+                    <h3 id="suspended-users">0</h3>
+                    <p>일시정지</p>
+                </div>
+                <div class="stat-card">
                     <h3 id="rejected-users">0</h3>
                     <p>거절</p>
                 </div>
@@ -721,18 +725,18 @@
 
         // 사용자 표시
         function displayUsers() {
-            let filteredUsers = currentFilter === 'all' 
-                ? allUsers 
-                : allUsers.filter(u => u.status === currentFilter);
-
-            // 최신 가입 순서로 정렬 (가입일 내림차순)
-            filteredUsers.sort((a, b) => {
+            // 전체 사용자를 최신 가입 순서로 정렬 (가입일 내림차순)
+            const sortedAllUsers = [...allUsers].sort((a, b) => {
                 const dateA = getTimestamp(a.createdAt);
                 const dateB = getTimestamp(b.createdAt);
                 return dateB - dateA; // 내림차순 (최신이 위로)
             });
 
-            const totalCount = filteredUsers.length;
+            let filteredUsers = currentFilter === 'all' 
+                ? sortedAllUsers 
+                : sortedAllUsers.filter(u => u.status === currentFilter);
+
+            const totalCount = sortedAllUsers.length;
 
             if (filteredUsers.length === 0) {
                 const emptyMsg = '<tr><td colspan="100%" style="text-align: center; color: #999;">사용자가 없습니다.</td></tr>';
@@ -744,9 +748,11 @@
 
             // 기본 정보 탭
             document.getElementById('basic-tbody').innerHTML = filteredUsers.map((user, index) => {
+                // 전체 사용자 목록에서의 실제 인덱스 찾기
+                const actualIndex = sortedAllUsers.findIndex(u => u.id === user.id);
                 return `
                 <tr>
-                    <td style="text-align: center;">${totalCount - index}</td>
+                    <td style="text-align: center;">${totalCount - actualIndex}</td>
                     <td>${user.email}</td>
                     <td>${user.nickname || '-'}</td>
                     <td><span class="status ${user.status}">${getStatusText(user.status)}</span></td>
@@ -764,6 +770,9 @@
 
             // IP 정보 탭
             document.getElementById('ip-tbody').innerHTML = filteredUsers.map((user, index) => {
+                // 전체 사용자 목록에서의 실제 인덱스 찾기
+                const actualIndex = sortedAllUsers.findIndex(u => u.id === user.id);
+                
                 // IP 비교 로직
                 let ipComparison = '';
                 if (user.signupIP === 'unknown' || user.lastLoginIP === 'N/A') {
@@ -776,7 +785,7 @@
 
                 return `
                 <tr>
-                    <td style="text-align: center;">${totalCount - index}</td>
+                    <td style="text-align: center;">${totalCount - actualIndex}</td>
                     <td>${user.email}</td>
                     <td>${user.nickname || '-'}</td>
                     <td style="text-align: center; font-family: monospace; font-size: 12px;">${user.signupIP || 'unknown'}</td>
@@ -788,6 +797,9 @@
 
             // 일정 정보 탭
             document.getElementById('schedule-tbody').innerHTML = filteredUsers.map((user, index) => {
+                // 전체 사용자 목록에서의 실제 인덱스 찾기
+                const actualIndex = sortedAllUsers.findIndex(u => u.id === user.id);
+                
                 // 만료일 표시 및 자동 일시정지 체크
                 let expiryDisplay = '-';
                 let isExpired = false;
@@ -818,7 +830,7 @@
 
                 return `
                 <tr>
-                    <td style="text-align: center;">${totalCount - index}</td>
+                    <td style="text-align: center;">${totalCount - actualIndex}</td>
                     <td>${user.email}</td>
                     <td>${user.nickname || '-'}</td>
                     <td>${formatDate(user.createdAt)}</td>
