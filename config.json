@@ -1,6 +1,0 @@
-{
-  "firebase": {
-    "disabled": true,
-    "note": "API 키는 환경변수로 관리됩니다. setup_security.py를 실행하세요."
-  }
-}
