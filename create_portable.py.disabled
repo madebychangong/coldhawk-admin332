@@ -1,0 +1,152 @@
+"""
+Coldhawk 포터블 버전 생성기
+exe 파일과 환경변수 설정 스크립트를 함께 패키징
+"""
+import os
+import shutil
+import zipfile
+from pathlib import Path
+
+def create_portable_package():
+    """포터블 패키지 생성"""
+    print("ColdHawk_test.ver1 포터블 버전 생성 중...")
+    
+    # 포터블 폴더 생성
+    portable_dir = Path("ColdHawk_test.ver1_Portable")
+    if portable_dir.exists():
+        shutil.rmtree(portable_dir)
+    portable_dir.mkdir()
+    
+    # exe 파일 복사
+    exe_path = Path("dist/ColdHawk_test.ver1.exe")
+    if exe_path.exists():
+        shutil.copy2(exe_path, portable_dir / "ColdHawk_test.ver1.exe")
+        print("ColdHawk_test.ver1.exe 복사 완료")
+    else:
+        print("ColdHawk_test.ver1.exe를 찾을 수 없습니다. 먼저 빌드해주세요.")
+        return
+    
+    # 리소스 파일 복사
+    resources_dir = portable_dir / "resources"
+    if Path("resources").exists():
+        shutil.copytree("resources", resources_dir)
+        print("리소스 파일 복사 완료")
+    
+    # 스타일 파일 복사
+    styles_dir = portable_dir / "ui" / "styles"
+    if Path("ui/styles").exists():
+        styles_dir.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree("ui/styles", styles_dir)
+        print("스타일 파일 복사 완료")
+    
+    # 환경변수 설정 스크립트 생성
+    create_setup_scripts(portable_dir)
+    
+    # 사용자 가이드 생성
+    create_user_guide(portable_dir)
+    
+    # ZIP 파일 생성
+    create_zip_package(portable_dir)
+    
+    print(f"\n포터블 버전 생성 완료!")
+    print(f"위치: {portable_dir.absolute()}")
+    print(f"ZIP: Coldhawk_Portable.zip")
+
+def create_setup_scripts(portable_dir):
+    """환경변수 설정 스크립트 생성"""
+    
+    # Windows 배치 파일
+    setup_bat = portable_dir / "설정.bat"
+    with open(setup_bat, 'w', encoding='utf-8') as f:
+        f.write("""@echo off
+chcp 65001 >nul
+echo ========================================
+echo ColdHawk_test.ver1 환경변수 설정
+echo ========================================
+echo.
+
+echo Firebase 환경변수를 설정합니다...
+setx FIREBASE_API_KEY "AIzaSyAo2-_VoDQsNjRCimzns5V6boc6-ajP8zs" >nul 2>&1
+setx FIREBASE_AUTH_DOMAIN "coldhawk-id.firebaseapp.com" >nul 2>&1
+setx FIREBASE_DATABASE_URL "https://coldhawk-id.firebaseio.com" >nul 2>&1
+setx FIREBASE_STORAGE_BUCKET "coldhawk-id.appspot.com" >nul 2>&1
+
+echo ✅ 환경변수 설정 완료!
+echo.
+echo ⚠️  새로운 명령 프롬프트를 열고 ColdHawk_test.ver1.exe를 실행하세요.
+echo.
+pause
+""")
+    
+    # 실행용 배치 파일
+    run_bat = portable_dir / "Coldhawk_실행.bat"
+    with open(run_bat, 'w', encoding='utf-8') as f:
+        f.write("""@echo off
+chcp 65001 >nul
+
+REM 환경변수 임시 설정
+set FIREBASE_API_KEY=AIzaSyAo2-_VoDQsNjRCimzns5V6boc6-ajP8zs
+set FIREBASE_AUTH_DOMAIN=coldhawk-id.firebaseapp.com
+set FIREBASE_DATABASE_URL=https://coldhawk-id.firebaseio.com
+set FIREBASE_STORAGE_BUCKET=coldhawk-id.appspot.com
+
+REM Coldhawk 실행
+echo ColdHawk_test.ver1을 시작합니다...
+start "" "ColdHawk_test.ver1.exe"
+""")
+    
+    print("환경변수 설정 스크립트 생성 완료")
+
+def create_user_guide(portable_dir):
+    """사용자 가이드 생성"""
+    guide_path = portable_dir / "사용법.txt"
+    with open(guide_path, 'w', encoding='utf-8') as f:
+        f.write("""🚀 ColdHawk_test.ver1 포터블 버전 사용법
+
+📋 처음 사용하시는 경우:
+1. "설정.bat" 파일을 실행하세요
+2. 새로운 명령 프롬프트를 여세요
+3. "Coldhawk.exe"를 실행하세요
+
+🚀 빠른 실행:
+- "ColdHawk_test.ver1_실행.bat" 파일을 더블클릭하세요
+- (환경변수를 매번 임시 설정합니다)
+
+🔑 로그인:
+- Firebase 계정으로 로그인하세요
+- 이메일과 비밀번호를 입력하세요
+
+📁 파일 구성:
+- ColdHawk_test.ver1.exe: 메인 프로그램
+- 설정.bat: 환경변수 영구 설정
+- Coldhawk_실행.bat: 빠른 실행
+- resources/: 프로그램 리소스
+- ui/styles/: 프로그램 스타일
+
+❓ 문제 해결:
+- 로그인 오류가 나면 "설정.bat"을 다시 실행하세요
+- 컴퓨터를 재시작해보세요
+- 관리자 권한으로 실행해보세요
+
+🎉 즐거운 사용 되세요!
+""")
+    
+    print("사용자 가이드 생성 완료")
+
+def create_zip_package(portable_dir):
+    """ZIP 패키지 생성"""
+    zip_path = "ColdHawk_test.ver1_Portable.zip"
+    if Path(zip_path).exists():
+        Path(zip_path).unlink()
+    
+    with zipfile.ZipFile(zip_path, 'w', zipfile.ZIP_DEFLATED) as zipf:
+        for root, dirs, files in os.walk(portable_dir):
+            for file in files:
+                file_path = Path(root) / file
+                arc_path = file_path.relative_to(portable_dir.parent)
+                zipf.write(file_path, arc_path)
+    
+    print("ZIP 패키지 생성 완료")
+
+if __name__ == "__main__":
+    create_portable_package()

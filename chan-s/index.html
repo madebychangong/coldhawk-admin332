@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>찬공's Studio — 홍보/보조 프로그램</title>
+<meta name="description" content="찬공's Studio — 홍보/보조 프로그램" />
+<meta property="og:title" content="찬공's Studio" />
+<meta property="og:description" content="시즌 홍보 페이지와 보조 프로그램을 한 번에" />
+<meta property="og:image" content="assets/og-image.png" />
+<meta name="theme-color" content="#0E0A1F" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/pretendardvariable.css" rel="stylesheet">
+
+<style>
+  :root{
+    --max:1200px;
+    --ink:#ECEAF7; --mut:#A1A0B3; --line:#232044; --bg:#0E0A1F;
+    --pri:#6C64FF; --accent:#A855F7; --pri-ink:#ffffff;
+    --chip:#5347C2; --chip-ink:#F5F3FF;
+    --radius:16px; --shadow:0 12px 36px rgba(0,0,0,.38);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0}
+  body{
+    font:16px/1.6 'Pretendard Variable','Inter','Noto Sans KR',ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Apple SD Gothic Neo",sans-serif;
+    color:var(--ink); background:var(--bg); letter-spacing:.01em;
+  }
+  a{text-decoration:none;color:inherit}
+  .container{max-width:var(--max);margin:0 auto;padding:24px 28px}
+  .section{padding:72px 0}
+  [data-section]{scroll-margin-top:var(--header-h,80px)}
+  @media(max-width:980px){.section{padding:52px 0}}
+  .grid{display:grid;gap:20px;grid-template-columns:repeat(12,1fr)}
+  .g3{grid-column:span 3}.g4{grid-column:span 4}.g5{grid-column:span 5}.g6{grid-column:span 6}.g7{grid-column:span 7}.g8{grid-column:span 8}.g12{grid-column:span 12}
+  @media(max-width:980px){.g3,.g4,.g5,.g6,.g7,.g8{grid-column:span 12}}
+  h1{font-size:clamp(34px,5vw,60px);line-height:1.05;margin:0 0 10px;letter-spacing:-.02em}
+  h2{font-size:clamp(22px,2.6vw,34px);line-height:1.16;margin:0 0 6px;letter-spacing:-.01em}
+  .lede{color:var(--mut);margin:6px 0 0}
+  @supports (font-variation-settings: normal){ h1,h2{font-variation-settings:'wght' 800} }
+
+  /* ===== Header ===== */
+  header{
+    position:sticky;top:0;z-index:60;backdrop-filter:saturate(120%) blur(10px);
+    background:linear-gradient(180deg,#ffffffcc,#ffffffa0);
+    border-bottom:1px solid var(--line);
+    transition:background .25s ease, border-color .25s ease
+  }
+  header.head-transparent{background:transparent;border-bottom-color:transparent}
+  header.head-transparent .menu a:hover{background:rgba(255,255,255,.12)}
+  header.head-transparent .brand .logo, header.head-transparent .menu a{color:#fff}
+
+  .nav{display:flex;align-items:center;justify-content:flex-start;gap:14px}
+  .brand{
+    display:flex;align-items:center;gap:10px;font-weight:900;
+    flex:0 0 auto; min-width:max-content; white-space:nowrap;
+  }
+  .logo{
+    display:inline-flex; align-items:center; gap:8px;
+    padding:6px 12px; border-radius:12px;
+    background:conic-gradient(from 210deg,#6C64FF,#A855F7,#6C64FF);
+    color:#fff; font-weight:900; font-size:clamp(16px,2vw,20px); line-height:1;
+  }
+  .logo img{height:1.2em;width:auto;display:block}
+  .menu{margin-left:auto;display:flex;gap:6px;align-items:center}
+  .menu a{padding:10px 12px;border-radius:10px}
+  .menu a:hover{background:#0f172a}
+  .btn{display:inline-flex;gap:8px;align-items:center;justify-content:center;padding:12px 16px;border-radius:12px;font-weight:800}
+  .btn.pri{background:linear-gradient(90deg,var(--pri),var(--accent));color:var(--pri-ink);box-shadow:var(--shadow)}
+  .btn.out{border:1px solid var(--line)}
+  .menu a.active{background:linear-gradient(180deg,#2A225C,#231E4A);color:#E7E5FF;font-weight:800}
+  .btn:focus-visible, .menu a:focus-visible, .logo:focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:12px}
+
+  /* Mobile menu */
+  .hamb{display:none}
+  @media(max-width:1100px){
+    .hamb{display:block}
+    .menu{position:fixed;inset:64px 16px auto 16px;display:none;flex-direction:column;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--bg);z-index:80}
+    .menu.open{display:flex}
+  }
+  @media(min-width:1101px){ .hamb{display:none} }
+
+  /* ===== Hero ===== */
+  .hero{position:relative;min-height:72vh;display:flex;align-items:flex-end;overflow:hidden;border-bottom:1px solid var(--line);
+    background:radial-gradient(800px 480px at 70% -10%, #6C64FF33, transparent 60%),
+              radial-gradient(600px 360px at 15% 10%, #A855F722, transparent 60%),
+              linear-gradient(180deg,#0F0B22,#0E0A1F);}
+  .hero::before{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.15),rgba(0,0,0,.35) 40%,rgba(0,0,0,.4))}
+  .hero .wrap{position:relative;padding:120px 0 96px;color:#fff}
+  .badge{display:inline-block;padding:6px 10px;border-radius:999px;background:rgba(255,255,255,.12);color:#fff;border:1px solid rgba(255,255,255,.18);font-weight:800}
+
+  .hero h1{ word-break: keep-all; text-wrap: balance; }
+  .nowrap{ white-space: nowrap; }
+
+  /* ===== Portfolio ===== */
+  .tile{position:relative;border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#0b1220}
+  .tile img{display:block;width:100%;height:auto;aspect-ratio:16/9;object-fit:cover;transition:transform .5s ease}
+  .tile:hover img{transform:scale(1.03)}
+  .cap{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-top:1px solid var(--line);font-size:14px;color:var(--mut)}
+  .outcap{display:flex;align-items:center;justify-content:space-between;margin:6px 6px 18px 6px;font-size:14px;color:var(--mut)}
+
+  /* ===== Lightbox (JS 기반) ===== */
+  .lb{position:fixed;inset:0;display:none;align-items:flex-start;justify-content:center;background:rgba(0,0,0,.72);z-index:90;padding:32px 24px 48px;overflow:auto}
+  .lb.open{display:flex}
+  .lb .frame{max-width:calc(100vw - 48px);max-height:calc(100vh - 96px);overflow:auto;border-radius:16px;box-shadow:0 30px 90px rgba(0,0,0,.55);background:#0b1220}
+  .lb img{display:block;max-width:100%;height:auto}
+  .lb .close{position:fixed;top:18px;right:18px;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;background:#0b1220;color:#fff;font-weight:900;text-decoration:none}
+
+  /* ===== Process & Metrics ===== */
+  .step{display:flex;gap:12px;align-items:flex-start}
+  .n{
+    width:28px;height:28px;flex:0 0 28px;border-radius:50%;
+    display:grid;place-items:center;
+    background:linear-gradient(180deg,var(--chip),#3C318E);
+    color:var(--chip-ink);border:1px solid rgba(255,255,255,.18);
+    font-weight:900;font-size:13px;margin-top:2px;
+  }
+  .step strong{display:block;margin-top:2px;line-height:1.2}
+  .step p.lede{margin:6px 0 0}
+  .step + .step{margin-top:24px;padding-top:10px}
+
+  #process .step:first-of-type { margin-top: 40px; }
+
+  .metric{display:flex;flex-direction:column;gap:4px}
+  .kpi{font-size:clamp(24px,3.2vw,36px);font-weight:900}
+
+  /* ===== Services: 데스크톱은 구분선 유지 ===== */
+  #services .service{
+    border-top: 1px solid var(--line);
+    padding-top: 14px;
+    margin-top: 14px;
+  }
+
+  /* === 모바일 좌우 여백 + 안전영역 === */
+  :root{ --edge: 28px; }
+  @supports (padding: max(0px)){
+    :root{
+      --edgeL: max(env(safe-area-inset-left),  var(--edge));
+      --edgeR: max(env(safe-area-inset-right), var(--edge));
+    }
+  }
+  @media (max-width: 980px){
+    .container{
+      padding-left:  var(--edgeL) !important;
+      padding-right: var(--edgeR) !important;
+    }
+    .hero .container{
+      padding-left:  var(--edgeL) !important;
+      padding-right: var(--edgeR) !important;
+    }
+  }
+
+  /* === Back-to-top 버튼 === */
+  #topBtn{
+    position: fixed;
+    right: 18px; bottom: 18px;
+    width: 48px; height: 48px;
+    border-radius: 14px;
+    z-index: 1100;
+    opacity: 0;
+    transform: translateY(12px);
+    pointer-events: none;
+    transition: opacity .25s ease, transform .25s ease, box-shadow .2s ease;
+    box-shadow: 0 10px 28px rgba(108,100,255,.45);
+  }
+  #topBtn.show{ opacity:1; transform:none; pointer-events:auto; }
+  @supports (padding: max(0px)){
+    #topBtn{
+      right:  max(env(safe-area-inset-right), 18px);
+      bottom: max(env(safe-area-inset-bottom), 18px);
+    }
+  }
+
+  /* ===== Pricing spacing ===== */
+  #contact{padding-bottom:140px}
+  #contact h2{margin-bottom:6px}
+  .pricing-grid{display:grid;gap:20px;margin-top:30px}
+  .pricing-cta{margin-top:18px}
+  .pricing-note{margin-top:12px}
+
+  /* ===== Footer ===== */
+  footer{border-top:1px solid var(--line);background:linear-gradient(180deg,transparent,#00000008);color:var(--mut)}
+
+  /* ===== Reveal ===== */
+  [data-reveal]{opacity:0;transform:translateY(14px);transition:opacity .6s ease, transform .6s ease}
+  [data-reveal].seen{opacity:1;transform:none}
+
+  /* ===== Modal (macro) ===== */
+  .md{position:fixed;inset:0;z-index:1200;display:none}
+  .md.show{display:block}
+  .md-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(2px)}
+  .md-panel{
+    position:absolute; inset:auto 50% 8% 50%; transform:translate(-50%,0);
+    width:min(1040px, calc(100vw - 80px)); max-height:80vh; overflow:auto;
+    border-radius:20px; background:#0b1220; border:1px solid var(--line);
+    padding:30px 30px 32px; box-shadow:0 40px 110px rgba(0,0,0,.60);
+  }
+  .md-close{position:absolute;right:14px;top:12px;width:40px;height:40px;border-radius:12px;display:grid;place-items:center;background:#0b1220;color:#fff;text-decoration:none}
+
+  /* ===== Anti-save UX ===== */
+  .tile img, .lb img{-webkit-user-drag:none;user-select:none;-webkit-touch-callout:none}
+
+  /* ===== Motion reduce ===== */
+  @media (prefers-reduced-motion: reduce){
+    .tile img{transition:none}
+    [data-reveal]{transition:none}
+  }
+
+  /* 포트폴리오 헤더 버튼: 한 줄 유지 */
+  #portfolio a.btn{ white-space: nowrap; }
+
+  @media (max-width: 420px){
+    #portfolio a.btn{ font-size: 14px; padding: 10px 12px; }
+  }
+
+  /* 모바일: 서비스 섹션 2열 카드형 유지 (중복 정리) */
+  @media (max-width: 980px){
+    #services .g8 .g4{ grid-column: span 6 !important; }
+    #services .g8.grid{ gap: 12px; }
+    #services .service{
+      background: rgba(255,255,255,.04) !important;
+      border-radius: 12px !important;
+      padding: 14px !important;
+      border: none !important;
+      box-shadow: 0 6px 14px rgba(0,0,0,.18);
+      margin-top: 0 !important;
+    }
+  }
+
+  /* 모바일: 진행 프로세스/목표 카드형 */
+  @media (max-width: 980px){
+    #process .step{
+      padding:12px 14px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background: rgba(255,255,255,.03);
+    }
+    #process .step + .step{ margin-top:14px; padding-top:10px; }
+
+    .goals .metric{
+      padding:12px 14px;
+      border:1px solid var(--line);
+      border-radius:12px;
+      background: rgba(255,255,255,.03);
+    }
+    .goals .grid{ gap: 14px; }
+  }
+
+  @media (min-width: 1200px){
+    #topBtn{ right: calc((100vw - var(--max)) / 2 + 18px); }
+  }
+
+  /* 시즌 목표: 제목은 위, 목표는 아래로 붙이기 */
+  #process .goals-col{ display:flex; flex-direction:column; }
+  #process .goals{ margin-top:50px; }
+  @media (max-width: 980px){ #process .goals{ margin-top: 14px; } }
+
+  /* ===== Pricing cards: Glass ===== */
+  .pricing-grid > div{
+    position: relative;
+    padding: 18px 20px !important;
+    border-radius: 16px !important;
+    background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03)) !important;
+    border: 1px solid rgba(255,255,255,.18) !important;
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.10), 0 12px 32px rgba(0,0,0,.35);
+    overflow: hidden;
+    transition: transform .25s ease, box-shadow .3s ease, border-color .3s ease, background .3s ease;
+  }
+  .pricing-grid > div::before{
+    content:''; position:absolute; inset:0;
+    background:
+      radial-gradient(120% 60% at 0% 0%, rgba(255,255,255,.22), transparent 60%),
+      radial-gradient(80% 50% at 100% -10%, rgba(168,85,247,.18), transparent 60%);
+    pointer-events:none; mix-blend-mode: screen; opacity:.35;
+  }
+  .pricing-grid > div:hover{
+    transform: translateY(-2px);
+    border-color: rgba(255,255,255,.26) !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.12), 0 16px 44px rgba(0,0,0,.45);
+  }
+  .pricing-grid > div strong{ font-weight: 900; letter-spacing: -.01em; }
+  @media (max-width: 980px){ .pricing-grid{ gap: 22px; } }
+</style>
+
+<style id="chan-minpatch">
+/* A. 스크롤된 헤더 색 */
+header:not(.head-transparent){
+  background: linear-gradient(180deg, rgba(0,172,130,.92), rgba(0,172,130,.78)) !important;
+}
+/* B. 모바일: 기본 메뉴 숨김 */
+@media (max-width:1100px){
+  header nav#menu, header .menu{ display:none !important; }
+  #hamb, .hamb{ margin-left:auto !important; order:99; }
+}
+/* C. 햄버거 스타일 */
+#hamb, .hamb{ border:none !important; box-shadow:none !important; background: linear-gradient(135deg, var(--pri, #6C64FF), var(--accent, #00AC82)) !important; color:#fff !important; }
+/* D. Top 버튼 고정 */
+#topBtn{ position:fixed !important; right:18px !important; left:auto !important; bottom:18px !important; transform:none !important; translate:none !important; will-change:auto !important; }
+#topBtn.show{ opacity:1 !important; }
+#topBtn:not(.show){ opacity:0 !important; }
+#topBtn .rip{ display:none !important; }
+/* E. 포트폴리오 프리뷰 상단 고정 */
+#portfolio img, #portfolio video, .tile img, .tile video{ object-position: top center !important; }
+</style>
+
+<style id="theme-pgy-1">
+  :root{
+    --bg:#0E0A1F;
+    --line:#26233F;
+    --pri:#7C5CFF;
+    --accent:#00AC82;
+    --chip:#FFD34D;
+    --pri-ink:#fff;
+    --chip-ink:#1A1300;
+  }
+  header.head-transparent{
+    background: linear-gradient(180deg, rgba(124,92,255,.12), rgba(0,172,130,.08)) !important;
+    border-bottom-color: transparent !important;
+  }
+  header:not(.head-transparent){
+    background: linear-gradient(180deg, rgba(0,172,130,.92), rgba(0,172,130,.78)) !important;
+    border-bottom-color: color-mix(in srgb, #00AC82 30%, transparent);
+  }
+  .hero{
+    background:
+      radial-gradient(900px 520px at 72% -8%,  color-mix(in srgb, var(--pri) 24%, transparent), transparent 60%),
+      radial-gradient(700px 420px at 14%  6%,  color-mix(in srgb, var(--accent) 24%, transparent), transparent 60%),
+      linear-gradient(180deg,#0F0B22,#0E0A1F) !important;
+  }
+  .hero::before{
+    background: linear-gradient(180deg, rgba(0,0,0,.10), rgba(0,0,0,.24) 40%, rgba(0,0,0,.30)) !important;
+  }
+  .btn.pri{
+    background: linear-gradient(90deg, var(--pri), var(--accent)) !important;
+    color: var(--pri-ink) !important;
+    box-shadow: 0 12px 28px color-mix(in srgb, var(--pri) 30%, transparent) !important;
+  }
+  .btn.out{ border: 1px solid color-mix(in srgb, var(--pri) 28%, var(--accent) 12%) !important; }
+  .menu a:hover{ background: color-mix(in srgb, var(--pri) 16%, transparent) !important; }
+  .menu a.active{
+    background: linear-gradient(180deg, color-mix(in srgb, var(--pri) 32%, transparent),
+                                         color-mix(in srgb, var(--accent) 22%, transparent)) !important;
+    color:#EDEBFF !important; font-weight:800 !important;
+  }
+  #hamb, .hamb, a#topBtn, #topBtn{
+    background: linear-gradient(135deg, var(--pri), var(--accent)) !important;
+    color: var(--pri-ink) !important;
+  }
+  .badge, .n{
+    background: linear-gradient(180deg, var(--chip), #FFB300) !important;
+    color: var(--chip-ink) !important;
+    box-shadow: 0 8px 18px color-mix(in srgb, var(--chip) 28%, transparent) !important;
+  }
+  :focus-visible{
+    outline: 2px solid var(--chip) !important;
+    outline-offset: 3px !important;
+    border-radius: 12px;
+  }
+</style>
+
+<style id="header-style-option-A">
+/* Option A — Dark Glass */
+header:not(.head-transparent){
+  background: linear-gradient(180deg, rgba(12,15,28,.85), rgba(12,15,28,.78)) !important;
+  border-bottom: 1px solid color-mix(in srgb, var(--accent) 28%, transparent) !important;
+  backdrop-filter: saturate(130%) blur(10px);
+}
+.menu a{ color:#ECEAF7 !important; }
+.menu a:hover{ background: rgba(255,255,255,.08) !important; }
+.menu a.active{
+  background: linear-gradient(180deg, color-mix(in srgb, var(--pri) 32%, transparent),
+                                       color-mix(in srgb, var(--accent) 22%, transparent)) !important;
+  color:#F3F2FF !important; font-weight:800 !important;
+}
+</style>
+
+<!-- 리빌 애니메이션 CSS -->
+<style id="reveal-sasasak-css">
+  [data-reveal]{
+    opacity: 0;
+    transform: translateY(18px);
+    will-change: transform, opacity;
+    transition: transform .44s cubic-bezier(.22,1,.36,1), opacity .44s cubic-bezier(.22,1,.36,1);
+    transition-delay: var(--delay, 0ms);
+  }
+  [data-reveal].seen{ opacity: 1; transform: translateY(0); }
+  @media (max-width: 980px){
+    [data-reveal]{ transform: translateY(14px); transition-duration: .38s; }
+  }
+  @media (prefers-reduced-motion: reduce){
+    [data-reveal]{opacity:1 !important; transform:none !important; transition:none !important;}
+  }
+</style>
+
+<!-- 버튼 리플 CSS -->
+<style id="btn-ripple-css">
+  .btn{ position: relative; overflow: hidden; }
+  .btn .rip{
+    position:absolute; left:var(--rx,50%); top:var(--ry,50%);
+    width:10px; height:10px; border-radius:50%; opacity:0;
+    transform: translate(-50%,-50%) scale(1);
+    background: rgba(255,255,255,.35); pointer-events:none;
+  }
+  .btn.rippling .rip{ animation: rip .6s ease-out; }
+  @keyframes rip{
+    from{ opacity:.4; transform: translate(-50%,-50%) scale(1); }
+    to{ opacity:0; transform: translate(-50%,-50%) scale(18); }
+  }
+</style>
+
+</head>
+<body>
+
+<header>
+  <div class="container nav">
+    <div class="brand">
+      <span class="logo" aria-label="Chan’s">Chan’s</span><span>찬공's Studio</span>
+    </div>
+
+    <button class="hamb btn out" id="hamb" aria-label="메뉴" aria-expanded="false">☰</button>
+    <nav class="menu" id="menu">
+      <a href="#home">홈</a>
+      <a href="#services">서비스</a>
+      <a href="#portfolio">포트폴리오</a>
+      <a href="#process">프로세스</a>
+      <a href="#contact">패키지</a>
+      <a class="btn pri" data-kakao href="https://open.kakao.com/o/sCaiRmIh" target="_blank" rel="noopener noreferrer">상담</a>
+    </nav>
+  </div>
+</header>
+
+<section id="home" class="hero" data-section>
+  <div class="container wrap">
+    <h1>[ 홍보페이지 · 게시글 매크로 ]<br/>시즌 홍보를 한번에 준비하<span class="nowrap">자.</span></h1>
+    <p class="lede">맞춤 홍보이미지 · 편한 사용법 · 보조 프로그램 · 무료 수정</p>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:14px">
+      <a class="btn pri" data-kakao href="https://open.kakao.com/o/sCaiRmIh" target="_blank" rel="noopener noreferrer">카카오톡 상담하기</a>
+      <a class="btn out" href="#portfolio">작업 보기</a>
+    </div>
+  </div>
+</section>
+
+<main>
+  <!-- Services -->
+  <section id="services" class="section container card pad24" data-section data-reveal>
+    <div class="grid">
+      <div class="g4"><h2>제공 서비스</h2><p class="lede">당신에게 맞는 단 한 장, 쉽고 빠른 적용</p></div>
+      <div class="g8 grid">
+        <div class="g4 service"><div><strong>전용 홍보 이미지</strong><p class="lede">톤·문구 요청대로 맞춤 제작<br>(PNG / GIF)</p></div></div>
+        <div class="g4 service"><div><strong>사용 가이드 안내</strong><p class="lede">1:1 카톡으로 자세한 안내</p></div></div>
+        <div class="g4 service" id="macroCard">
+          <div>
+            <strong>게시글 매크로</strong>
+            <p class="lede">귀찮은 반복 업무를 돕는 <br>안전한 게시글 매크로</p>
+            <a href="#" class="btn pri" data-macro-open style="margin-top:8px;padding:10px 12px;font-size:14px">자세히 보기 · 기능/요금</a>
+          </div>
+        </div>
+        <div class="g4 service"><div><strong>무료 수정</strong><p class="lede">시즌 내 무료 수정 가능</p></div></div>
+        <div class="g4 service"><div><strong>편한 게시물 작성</strong><p class="lede">편한 게시물 작성을 위한 <br>복붙용 코드 제공</p></div></div>
+        <div class="g4 service"><div><strong>운영 컨설팅</strong><p class="lede">그외 각종 상담 및<br>다방면의 컨설팅 지원</p></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Macro Modal (popup) -->
+  <div id="macroModal" class="md" hidden>
+    <div class="md-backdrop" data-macro-close></div>
+    <div class="md-panel" role="dialog" aria-modal="true" aria-labelledby="macroModalTitle">
+      <a href="#" class="md-close" aria-label="닫기" data-macro-close>×</a>
+      <h2 id="macroModalTitle" style="margin-bottom:10px">게시글 매크로 — 주요 기능</h2>
+      <div class="grid" style="gap:16px;margin-top:12px">
+        <div class="g6" style="border:1px solid var(--line);border-radius:14px;padding:16px;background:rgba(255,255,255,.04)"><strong>인벤 게시글 자동 등록</strong><p class="lede" style="margin-top:8px">맞춤 설정한 내용으로 자동 게시</p></div>
+        <div class="g6" style="border:1px solid var(--line);border-radius:14px;padding:16px;background:rgba(255,255,255,.04)"><strong>재업로드 기능</strong><p class="lede" style="margin-top:8px">원하는 시간(초)마다 자동으로 글 업로드</p></div>
+        <div class="g6" style="border:1px solid var(--line);border-radius:14px;padding:16px;background:rgba(255,255,255,.04)"><strong>게시글 3개 유지</strong><p class="lede" style="margin-top:8px">1일 게시글 제한 방지 자동관리</p></div>
+        <div class="g6" style="border:1px solid var(--line);border-radius:14px;padding:16px;background:rgba(255,255,255,.04)"><strong>다중 계정 지원</strong><p class="lede" style="margin-top:8px">최대 10개 계정을 동시에 관리</p></div>
+        <div class="g6" style="border:1px solid var(--line);border-radius:14px;padding:16px;background:rgba(255,255,255,.04)"><strong>개인화 사용</strong><p class="lede" style="margin-top:8px">로그인 기반으로 어디서든 사용가능</p></div>
+        <div class="g6" style="border:1px solid var(--line);border-radius:14px;padding:16px;background:rgba(255,255,255,.04)"><strong>깔끔 · 가벼움</strong><p class="lede" style="margin-top:8px">깔끔한 UI의 가벼운 프로그램</p></div>
+      </div>
+      <h2 style="margin-top:22px">이런 분들께 추천합니다</h2>
+      <ul class="lede" style="margin-top:10px;line-height:1.95">
+        <li>디아4, 피오이2 등 게임시즌마다 홍보하시는 분</li>
+        <li>인벤에 정기적으로 홍보글을 올리시는 분</li>
+        <li>수동, 반복 작업 시간을 줄이고 싶으신 분</li>
+        <li>여러 커뮤니티를 동시에 관리하고 싶으신 분</li>
+        <li>게임과 동시에 실행하고 싶으신 분</li>
+      </ul>
+      <h2 style="margin-top:22px">설치 · 이용 안내</h2>
+      <ol class="lede" style="margin-top:12px;line-height:2.0;padding-left:28px">
+        <li style="margin-left:8px">상단 메뉴의 상담 버튼으로 문의 후 결제</li>
+        <li style="margin-left:8px">프로그램 설치 → 회원가입 → 로그인</li>
+        <li style="margin-left:8px">원하는대로 설정 후 자동 등록 시작</li>
+      </ol>
+      <div class="pricing-cta" style="margin-top:20px;display:flex;gap:12px;flex-wrap:wrap">
+        <a class="btn pri" data-kakao href="https://open.kakao.com/o/sCaiRmIh" target="_blank" rel="noopener noreferrer">카카오톡 상담하기</a>
+        <a class="btn out" href="#contact" data-macro-close>요금 보기</a>
+        <a class="btn out" href="#" data-macro-close>닫기</a>
+      </div>
+    </div>
+  </div>
+  <!-- Portfolio -->
+  <section id="portfolio" class="section container" data-section data-reveal>
+    <div style="display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:10px">
+      <div><h2>포트폴리오</h2><p class="lede">썸네일을 클릭하면 <strong>원본 크기</strong>로 열립니다.</p></div>
+      <a class="btn out" href="https://open.kakao.com/o/sCaiRmIh" target="_blank" rel="noopener noreferrer">프로젝트 문의</a>
+    </div>
+
+    <div class="grid">
+      <div class="g6">
+        <article class="tile">
+          <a href="#" class="lb-open" data-src="assets/sp1.gif" data-alt="샘플 1 확대">
+            <img loading="lazy" decoding="async" src="assets/sp1.gif" sizes="(max-width:980px) 100vw, 50vw" width="1200" height="675" alt="샘플 1">
+          </a>
+        </article>
+      </div>
+
+      <div class="g6">
+        <article class="tile">
+          <a href="#" class="lb-open" data-src="https://ssnmitgehgzzcpmqwhzt.supabase.co/storage/v1/object/public/changong-images/jerry13.webp" data-alt="샘플 2 확대">
+            <img loading="lazy" decoding="async" src="https://ssnmitgehgzzcpmqwhzt.supabase.co/storage/v1/object/public/changong-images/jerry13.webp" sizes="(max-width:980px) 100vw, 50vw" width="1200" height="675" alt="샘플 2">
+          </a>
+        </article>
+      </div>
+
+      <div class="g4">
+        <article class="tile">
+          <a href="#" class="lb-open" data-src="https://ssnmitgehgzzcpmqwhzt.supabase.co/storage/v1/object/public/changong-images/aron4.webp" data-alt="샘플 3 확대">
+            <img loading="lazy" decoding="async" src="https://ssnmitgehgzzcpmqwhzt.supabase.co/storage/v1/object/public/changong-images/aron4.webp" sizes="(max-width:980px) 100vw, 33vw" width="1000" height="562" alt="샘플 3">
+          </a>
+        </article>
+      </div>
+
+      <div class="g4">
+        <article class="tile">
+          <a href="#" class="lb-open" data-src="https://ssnmitgehgzzcpmqwhzt.supabase.co/storage/v1/object/public/changong-images/chaos100.png" data-alt="샘플 4 확대">
+            <img loading="lazy" decoding="async" src="https://ssnmitgehgzzcpmqwhzt.supabase.co/storage/v1/object/public/changong-images/chaos100.png" sizes="(max-width:980px) 100vw, 33vw" width="1000" height="562" alt="샘플 4">
+          </a>
+        </article>
+      </div>
+
+      <div class="g4">
+        <article class="tile">
+          <a href="#" class="lb-open" data-src="https://ssnmitgehgzzcpmqwhzt.supabase.co/storage/v1/object/public/changong-images/chaos-madebychangong.webp" data-alt="샘플 5 확대">
+            <img loading="lazy" decoding="async" src="https://ssnmitgehgzzcpmqwhzt.supabase.co/storage/v1/object/public/changong-images/chaos-madebychangong.webp" sizes="(max-width:980px) 100vw, 33vw" width="1000" height="562" alt="샘플 5">
+          </a>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Lightbox -->
+  <div id="lb" class="lb" aria-modal="true" role="dialog" hidden>
+    <a href="#" class="close" aria-label="닫기">×</a>
+    <div class="frame" id="lbFrame">
+      <img id="lbImg" src="" alt="">
+    </div>
+  </div>
+
+  <!-- Process + Metrics -->
+  <section id="process" class="section container card pad24" data-section data-reveal>
+    <div class="grid">
+      <div class="g6">
+        <h2>진행 프로세스</h2>
+            <div class="step"><div class="n">1</div><div><strong>미팅</strong><p class="lede">목표/톤/문구·레퍼런스 상담 (카톡/디스코드)</p></div></div>
+            <div class="step"><div class="n">2</div><div><strong>시안</strong><p class="lede">맞춤 홍보물 제작·피드백 및 테스트지면 전달</p></div></div>
+            <div class="step"><div class="n">3</div><div><strong>적용</strong><p class="lede">홍보물 납품 및 사용법 안내</p></div></div>
+            <div class="step"><div class="n">4</div><div><strong>후관리</strong><p class="lede">시즌 종료까지 이슈 및 문의사항 대응</p></div></div>
+      </div>
+
+      <div class="g6 goals-col">
+        <h2>시즌 목표</h2>
+        <div class="goals">
+          <div class="grid">
+            <div class="g6 metric"><span class="kpi">10팀</span><span class="lede">시즌 한정</span></div>
+            <div class="g6 metric"><span class="kpi">1–3일</span><span class="lede">평균 제작</span></div>
+            <div class="g6 metric"><span class="kpi">빠른 피드백</span><span class="lede">디자인 + 게시글 매크로</span></div>
+            <div class="g6 metric"><span class="kpi">카톡 1:1 A/S</span><span class="lede">철저한 후 관리</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="contact" class="section container" data-section data-reveal>
+    <div class="grid">
+      <div class="g12 card pad24">
+        <h2>패키지 · 가격</h2>
+        <div class="pricing-grid">
+          <div style="border:1px dashed var(--line);border-radius:14px;padding:14px"><strong>기본 패키지</strong> — 시즌 맞춤 홍보물 · 게시글 복붙용 한줄 코드화 · <em>수정 1회</em> · <strong>50,000원 ~</strong></div>
+          <div style="border:1px dashed var(--line);border-radius:14px;padding:14px"><strong>몸편한 패키지</strong> — 시즌 맞춤 홍보물 · <strong>게시글 매크로 포함</strong> · 게시글 복붙용 한줄 코드화 · <em>수정 3회</em> · <strong>120,000원 ~</strong></div>
+          <div style="border:1px dashed var(--line);border-radius:14px;padding:14px"><strong>맘까지 편한 패키지</strong> — 시즌 맞춤 홍보물 · 게시글 매크로 포함 · 게시글 복붙용 한줄 코드화 · <em>수정 5회 및 재제작 1회</em>  · <strong>150,000원 ~</strong></div>
+        </div>
+        <p class="pricing-note lede" style="margin-top:12px">※ 맞춤 홍보물 크기에, 기능에 따라 가격이 상이합니다.<br>※ 가격대별이 아닌 전체 패키지 총 10건만 제작합니다.<br>※ 수정: 텍스트/색상/간단 문구만 포함 (이미지 교체는 재제작 필요)</p>
+      
+      </div>
+      <!-- 매크로 요금 안내: 카드 밖 분리 + 세로 배치 -->
+      <div class="g12" style="margin-top:30px"></div>
+      <div class="g12">
+        <h2>게시글 매크로 이용요금</h2>
+        <div class="pricing-grid" style="margin-top:12px">
+          <div style="border:1px solid var(--line);border-radius:14px;padding:12px"><strong>1개월</strong><div class="lede" style="margin-top:4px">30,000원</div></div>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:12px"><strong>3개월</strong><div class="lede" style="margin-top:4px">80,000원</div></div>
+          <div style="border:1px solid var(--line);border-radius:14px;padding:12px"><strong>영구</strong><div class="lede" style="margin-top:4px">200,000원</div></div>
+        </div>
+        <div class="pricing-cta" style="margin-top:18px;display:flex;gap:10px;flex-wrap:wrap">
+          <a class="btn pri" data-kakao href="https://open.kakao.com/o/sCaiRmIh" target="_blank" rel="noopener noreferrer">카카오톡 상담하기</a>
+        </div>
+      </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="container" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+    <p class="lede">© <span id="y"></span> Changong's Studio — 시즌 홍보를 퀄리티있고 편하게</p>
+    <a class="btn out" href="#home">맨 위로</a>
+  </div>
+</footer>
+
+<a href="#home" class="btn pri top" id="topBtn" aria-label="맨 위로">↑</a>
+
+<script>
+  // Year
+  document.getElementById('y').textContent = new Date().getFullYear();
+
+  // Mobile menu toggle
+  const hamb = document.getElementById('hamb');
+  const menu = document.getElementById('menu');
+  hamb?.addEventListener('click',()=>{ const open = menu.classList.toggle('open'); hamb.setAttribute('aria-expanded', open? 'true':'false'); });
+  menu?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>menu.classList.remove('open')));
+
+  // Smooth scroll
+  document.querySelectorAll('a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',e=>{
+      const id=a.getAttribute('href'); if(!id || id.length<=1) return;
+      const el=document.querySelector(id); if(!el) return;
+      e.preventDefault(); el.scrollIntoView({behavior:'smooth',block:'start'});
+    });
+  });
+
+  // Scrollspy
+  const sections=[...document.querySelectorAll('[data-section]')];
+  const links=[...document.querySelectorAll('.menu a')];
+  const spy=()=>{ const y=window.scrollY+100; let current='#home';
+    sections.forEach(s=>{ if(s.offsetTop<=y) current='#'+s.id; });
+    links.forEach(l=>{ l.classList.toggle('active', l.getAttribute('href')===current); });
+  };
+  window.addEventListener('scroll',spy); spy();
+
+  // Reveal on scroll (observer for non-sasasak pieces, still ok)
+  const io=new IntersectionObserver((es)=>es.forEach(e=>{ if(e.isIntersecting) e.target.classList.add('seen'); }),{threshold:.12});
+  document.querySelectorAll('[data-reveal], .card, .section').forEach(el=>io.observe(el));
+
+  // Back to top (히어로 밖으로 벗어나면 표시)
+  const topBtn=document.getElementById('topBtn');
+  const topIO=new IntersectionObserver((es)=>{ es.forEach(e=>{ topBtn.classList.toggle('show', !e.isIntersecting); }); });
+  topIO.observe(document.querySelector('#home'));
+
+  // Transparent header over hero
+  const headerEl=document.querySelector('header');
+  const toggleHeader=()=>{ headerEl.classList.toggle('head-transparent', window.scrollY < 60); };
+  toggleHeader(); window.addEventListener('scroll', toggleHeader);
+
+  // Macro modal
+  const macroModal = document.getElementById('macroModal');
+  function openMacro(){ macroModal?.classList.add('show'); macroModal?.removeAttribute('hidden'); document.body.style.overflow='hidden'; }
+  function closeMacro(){ macroModal?.classList.remove('show'); macroModal?.setAttribute('hidden',''); document.body.style.overflow=''; }
+  document.querySelectorAll('[data-macro-open]').forEach(el=>el.addEventListener('click', (e)=>{ e.preventDefault(); openMacro(); }));
+  document.addEventListener('click', (e)=>{
+    const closeBtn = e.target.closest('[data-macro-close]');
+    if(closeBtn){
+      e.preventDefault();
+      const goPricing = closeBtn.matches('[href="#contact"], [href="#contact"] *');
+      closeMacro();
+      if(goPricing){
+        const sec = document.querySelector('#contact');
+        sec && sec.scrollIntoView({behavior:'smooth', block:'start'});
+      }
+    }
+  });
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && macroModal?.classList.contains('show')) closeMacro(); });
+
+  // ===== JS Lightbox (이미지 클릭 시 닫힘 유지 - 의도) =====
+  const lb = document.getElementById('lb');
+  const lbImg = document.getElementById('lbImg');
+  const lbOpenEls = document.querySelectorAll('.lb-open');
+  function openLB(src, alt){ lbImg.src = src; lbImg.alt = alt || ''; lb.classList.add('open'); lb.removeAttribute('hidden'); document.body.style.overflow='hidden'; }
+  function closeLB(){ lb.classList.remove('open'); lb.setAttribute('hidden',''); lbImg.src=''; document.body.style.overflow=''; }
+  lbOpenEls.forEach(el=>{ el.addEventListener('click', (e)=>{ e.preventDefault(); openLB(el.dataset.src, el.dataset.alt); }); });
+  lb.addEventListener('click', (e)=>{
+    const clickedBackdrop = (e.target === lb);
+    const clickedImg = (e.target === lbImg);            // ← 이미지 클릭시 닫힘 유지
+    const clickedClose = e.target.closest('.close');
+    if(clickedBackdrop || clickedImg || clickedClose){ e.preventDefault(); closeLB(); }
+  });
+  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape' && lb.classList.contains('open')) closeLB(); });
+
+  // Anti-save UX
+  document.addEventListener('contextmenu',(e)=>{ if(e.target.closest('.tile img') || e.target.closest('#lbImg')) e.preventDefault(); });
+  document.querySelectorAll('.tile img, #lbImg').forEach(img=>{ img.setAttribute('draggable','false'); });
+</script>
+
+<script>
+(function(){
+  var header = document.querySelector('header');
+  if(!header) return;
+  function setHeaderH(){
+    var h = header.offsetHeight || 68;
+    document.documentElement.style.setProperty('--header-h', h + 'px');
+  }
+  window.addEventListener('load', setHeaderH);
+  window.addEventListener('resize', setHeaderH, {passive:true});
+  setHeaderH();
+})();
+</script>
+
+<script>
+// Click ripple on .btn
+document.addEventListener('click', function(e){
+  var btn = e.target.closest('.btn');
+  if(!btn) return;
+  var rect = btn.getBoundingClientRect();
+  var x = (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left;
+  var y = (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top;
+  btn.style.setProperty('--rx', x + 'px');
+  btn.style.setProperty('--ry', y + 'px');
+  var rip = btn.querySelector('.rip');
+  if(!rip){
+    rip = document.createElement('span');
+    rip.className = 'rip';
+    btn.appendChild(rip);
+  }
+  btn.classList.remove('rippling');
+  void btn.offsetWidth;
+  btn.classList.add('rippling');
+  setTimeout(function(){ btn.classList.remove('rippling'); }, 600);
+}, {passive:true});
+</script>
+
+<script id="chan-minpatch-js">
+(function(){
+  // Overlay drawer for hamburger
+  var hamb = document.getElementById('hamb') || document.querySelector('.hamb');
+  if(hamb){
+    var drawer = document.getElementById('chan-drawer');
+    if(!drawer){
+      drawer = document.createElement('aside');
+      drawer.id = 'chan-drawer';
+      drawer.innerHTML = '<div class="chan-scrim" tabindex="-1"></div><nav class="chan-panel" role="menu"></nav>';
+      var css = document.createElement('style');
+      css.textContent =
+        '#chan-drawer{position:fixed;inset:0;z-index:1200;pointer-events:none}' +
+        '#chan-drawer .chan-scrim{position:absolute;inset:0;background:rgba(0,0,0,.35);backdrop-filter:blur(2px);opacity:0;transition:opacity .2s ease}' +
+        '#chan-drawer .chan-panel{position:absolute;top:64px;right:0;width:min(86vw,320px);padding:14px;border:1px solid rgba(255,255,255,.06);border-right:none;border-radius:14px 0 0 14px;background:var(--bg,#0E0A1F);transform:translateX(12px);opacity:0;pointer-events:none;transition:transform .28s ease,opacity .28s ease;display:flex;flex-direction:column;gap:10px;box-shadow:0 18px 44px rgba(0,0,0,.35)}' +
+        '#chan-drawer.show{pointer-events:auto}#chan-drawer.show .chan-scrim{opacity:1}#chan-drawer.show .chan-panel{transform:none;opacity:1;pointer-events:auto}' +
+        '#chan-drawer a{display:block;padding:12px;border-radius:10px;color:inherit;text-decoration:none}#chan-drawer a:hover{background:#0f172a}';
+      drawer.appendChild(css);
+      document.body.appendChild(drawer);
+    }
+    var panel = drawer.querySelector('.chan-panel');
+    var scrim = drawer.querySelector('.chan-scrim');
+
+    function buildMenu(){
+      panel.innerHTML = '';
+      var src = document.querySelector('nav#menu') || document.querySelector('header nav');
+      if(src){ src.querySelectorAll('a').forEach(function(a){ panel.appendChild(a.cloneNode(true)); }); }
+    }
+    buildMenu();
+
+    function setOpen(open){
+      drawer.classList.toggle('show', open);
+      hamb.setAttribute('aria-expanded', open ? 'true' : 'false');
+      hamb.textContent = open ? '✕' : '☰';
+    }
+
+    document.addEventListener('click', function(e){
+      var btn = e.target.closest('#hamb, .hamb'); if(!btn) return;
+      e.preventDefault(); e.stopImmediatePropagation();
+      setOpen(!drawer.classList.contains('show'));
+    }, true);
+
+    scrim.addEventListener('click', function(){ setOpen(false); });
+    panel.addEventListener('click', function(e){
+      var a = e.target.closest('a'); if(!a) return;
+      setOpen(false);
+    });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') setOpen(false); });
+  }
+
+  // Ensure topBtn doesn't nudge on click
+  var topBtn = document.getElementById('topBtn');
+  if(topBtn){
+    document.addEventListener('click', function(e){
+      if(e.target.closest('#topBtn')){ topBtn.classList.remove('show'); }
+    }, true);
+  }
+})();
+</script>
+
+<!-- ▼ 수정된 사사삭 애니메이션 JS (위로 이동해도 표시) -->
+<script id="reveal-sasasak-js">
+(function(){
+  // 스크롤 방향
+  let lastY = window.scrollY;
+  let dir = 'down';
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    dir = (y > lastY) ? 'down' : (y < lastY) ? 'up' : dir;
+    lastY = y;
+  }, { passive: true });
+
+  // 앵커 클릭 시 잠시 강제 표시
+  let navJumpUntil = 0;
+  document.addEventListener('click', (e)=>{
+    const a = e.target.closest('a[href^="#"]');
+    if (a) navJumpUntil = Date.now() + 1200;
+  }, true);
+
+  // 대상 등록 + 지연
+  const groups = [
+    ['#services .g8.grid > *', 70],
+    ['#portfolio .grid > *', 80],
+    ['#process .step', 60],
+    ['#process .goals .metric', 60],
+    ['#contact .pricing-grid > div', 80]
+  ];
+  groups.forEach(([sel, gap])=>{
+    document.querySelectorAll(sel).forEach((el,i)=>{
+      el.setAttribute('data-reveal','');
+      el.style.setProperty('--delay', (i * gap) + 'ms');
+    });
+  });
+  document.querySelectorAll('#home .wrap > *:not(.btn), section .container > h2, section .container > .lede')
+    .forEach((el,i)=>{
+      el.setAttribute('data-reveal','');
+      el.style.setProperty('--delay', (i * 60) + 'ms');
+    });
+
+  // 방향과 무관하게 '보이기', 위로 벗어날 때만 '숨김'
+  const io = new IntersectionObserver((entries)=>{
+    const now = Date.now();
+    entries.forEach(entry => {
+      const el = entry.target;
+      if (entry.isIntersecting || now < navJumpUntil) {
+        el.classList.add('seen');
+      } else if (!entry.isIntersecting && dir === 'up') {
+        el.classList.remove('seen');
+      }
+    });
+  }, { threshold: 0.12 });
+
+  document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+
+  // 최초 히어로 표시
+  window.addEventListener('load', () => {
+    document.querySelectorAll('#home .wrap > *').forEach(el => {
+      if (!el.hasAttribute('data-reveal')) el.setAttribute('data-reveal','');
+      el.classList.add('seen');
+    });
+  });
+})();
+</script>
+
+</body>
+</html>
+
+
+
