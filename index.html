@@ -399,6 +399,173 @@
             display: block;
         }
 
+        /* 모바일 카드 레이아웃 */
+        .cards-container {
+            display: none;
+            gap: 16px;
+        }
+
+        .user-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            border: 1px solid rgba(102, 126, 234, 0.1);
+        }
+
+        .card-header {
+            padding: 16px;
+            border-bottom: 2px solid #667eea;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: nowrap;
+            overflow: hidden;
+        }
+
+        .card-header-item {
+            display: flex;
+            align-items: center;
+            min-width: 0;
+            flex: 0 1 auto;
+        }
+
+        .card-number {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+
+        .card-email {
+            color: #333;
+            font-weight: 600;
+            font-size: 13px;
+            word-break: break-all;
+            flex: 1;
+            min-width: 0;
+        }
+
+        .card-nickname {
+            color: #666;
+            font-size: 13px;
+            white-space: nowrap;
+            padding-left: 8px;
+            border-left: 1px solid #e9ecef;
+        }
+
+        .card-body {
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+        }
+
+        .card-label {
+            color: #666;
+            font-weight: 600;
+            min-width: 80px;
+        }
+
+        .card-value {
+            color: #333;
+            text-align: right;
+            word-break: break-word;
+        }
+
+        .card-status {
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-size: 11px;
+            font-weight: 700;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .card-footer {
+            padding: 12px 16px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .card-btn {
+            flex: 1;
+            min-width: 100px;
+            padding: 8px 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 11px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+            white-space: nowrap;
+        }
+
+        .card-approve-btn {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+        }
+
+        .card-approve-btn:active {
+            transform: scale(0.95);
+        }
+
+        .card-reject-btn {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+            color: white;
+        }
+
+        .card-reject-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* 모바일 드롭다운 스타일 */
+        .mobile-dropdown {
+            display: none;
+            background: white;
+            border: 2px solid #e9ecef;
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            width: 100%;
+            text-align: left;
+            color: #333;
+        }
+
+        .mobile-dropdown:active {
+            background: #f8f9fa;
+        }
+
+        .mobile-stats-summary {
+            display: none;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            color: white;
+            border: none;
+            text-align: center;
+        }
+
         /* 반응형 디자인 */
         @media (max-width: 768px) {
             .container {
@@ -406,48 +573,191 @@
             }
             
             .header {
-                padding: 20px 24px;
+                padding: 16px 20px;
                 flex-direction: column;
-                gap: 16px;
+                gap: 12px;
                 text-align: center;
             }
-            
-            .stats {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 16px;
+
+            .header h1 {
+                font-size: 24px;
             }
-            
-            .filters {
-                padding: 20px;
-                flex-direction: column;
-                align-items: stretch;
-            }
-            
-            .filter-btn {
-                margin: 4px 0;
-            }
-            
-            .tab-menu {
-                flex-direction: column;
-            }
-            
-            .tab-btn {
-                padding: 16px 24px;
-                border-bottom: 1px solid #e9ecef;
-                border-right: none;
-            }
-            
-            .users-table {
-                padding: 20px;
-                overflow-x: auto;
-            }
-            
-            table {
+
+            .logout-btn {
+                padding: 10px 20px;
                 font-size: 12px;
             }
             
-            th, td {
-                padding: 12px 8px;
+            .stats {
+                display: none;
+            }
+
+            .mobile-stats-summary {
+                display: block;
+            }
+            
+            .filters {
+                padding: 0;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 8px;
+                background: transparent;
+                box-shadow: none;
+                border: none;
+                margin-bottom: 8px;
+            }
+            
+            .filter-btn {
+                display: none;
+            }
+
+            .mobile-dropdown {
+                display: block;
+            }
+
+            .mobile-dropdown.filter-dropdown {
+                margin-bottom: 8px;
+            }
+            
+            .tab-menu {
+                display: none;
+            }
+
+            .mobile-dropdown.tab-dropdown {
+                display: block;
+                margin-bottom: 12px;
+            }
+
+            /* 모바일에서 테이블 숨기고 카드만 표시 */
+            .users-table {
+                display: none !important;
+                padding: 0;
+            }
+
+            .cards-container {
+                display: flex !important;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .user-card {
+                margin-bottom: 0;
+            }
+
+            .card-header {
+                padding: 12px;
+                gap: 8px;
+                cursor: pointer;
+                user-select: none;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                flex-wrap: wrap;
+            }
+
+            .card-header:active {
+                background: #f8f9fa;
+            }
+
+            .card-toggle-icon {
+                margin-left: auto;
+                font-size: 16px;
+                transition: transform 0.3s ease;
+                order: 3;
+                width: 24px;
+                text-align: center;
+            }
+
+            .card-number {
+                order: 1;
+                font-size: 11px;
+                padding: 3px 8px;
+                flex-shrink: 0;
+            }
+
+            .card-email {
+                order: 2;
+                font-size: 12px;
+                flex: 1;
+                min-width: 100px;
+            }
+
+            .card-nickname {
+                order: 4;
+                font-size: 12px;
+                flex: 1;
+                text-align: right;
+                min-width: 60px;
+                border-left: 1px solid #e9ecef;
+                padding-left: 8px;
+            }
+
+            .user-card.collapsed .card-body,
+            .user-card.collapsed .card-footer {
+                display: none;
+            }
+
+            .user-card.collapsed .card-toggle-icon {
+                transform: rotate(-90deg);
+            }
+
+            .card-body {
+                padding: 12px;
+                gap: 0;
+                display: block;
+            }
+
+            .card-row {
+                padding: 8px 0;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 12px;
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .card-row:last-child {
+                border-bottom: none;
+            }
+
+            .card-label {
+                min-width: 70px;
+                color: #666;
+                font-weight: 600;
+            }
+
+            .card-value {
+                text-align: right;
+                color: #333;
+                flex: 1;
+                word-break: break-word;
+                max-width: 150px;
+            }
+
+            .card-footer {
+                padding: 8px 12px;
+                border-top: 1px solid #e9ecef;
+                display: flex;
+                gap: 6px;
+                flex-wrap: wrap;
+            }
+
+            .card-btn {
+                flex: 1;
+                min-width: 70px;
+                padding: 8px 6px;
+                font-size: 11px;
+            }
+        }
+
+        /* 웹(768px 이상)에서는 테이블만 표시, 카드 숨김 */
+        @media (min-width: 769px) {
+            .cards-container {
+                display: none !important;
+            }
+
+            .users-table {
+                display: block !important;
             }
         }
 
@@ -505,6 +815,11 @@
                 </div>
             </div>
 
+            <!-- 모바일용 통계 요약 -->
+            <div class="mobile-stats-summary" id="mobile-stats-summary">
+                전체 <span id="m-total">0</span> | 승인대기 <span id="m-pending">0</span> | 승인완료 <span id="m-approved">0</span>
+            </div>
+
             <div class="filters">
                 <button class="filter-btn active" onclick="filterUsers('all')">전체</button>
                 <button class="filter-btn" onclick="filterUsers('pending')">승인 대기</button>
@@ -513,6 +828,15 @@
                 <button class="filter-btn" onclick="filterUsers('rejected')">거절</button>
             </div>
 
+            <!-- 모바일용 필터 드롭다운 -->
+            <select class="mobile-dropdown filter-dropdown" id="mobile-filter" onchange="filterUsers(this.value)">
+                <option value="all">📋 필터: 전체</option>
+                <option value="pending">⏳ 승인 대기</option>
+                <option value="approved">✅ 승인 완료</option>
+                <option value="suspended">⏸️ 일시정지</option>
+                <option value="rejected">❌ 거절</option>
+            </select>
+
             <!-- 탭 메뉴 -->
             <div class="tab-menu">
                 <button class="tab-btn active" onclick="switchTab('basic')">기본 정보</button>
@@ -520,8 +844,16 @@
                 <button class="tab-btn" onclick="switchTab('schedule')">일정 정보</button>
             </div>
 
+            <!-- 모바일용 탭 드롭다운 -->
+            <select class="mobile-dropdown tab-dropdown" id="mobile-tab" onchange="switchTab(this.value)">
+                <option value="basic">📝 탭: 기본 정보</option>
+                <option value="ip">🌐 IP 정보</option>
+                <option value="schedule">📅 일정 정보</option>
+            </select>
+
             <!-- 기본 정보 탭 -->
             <div id="basic-tab" class="tab-content active">
+                <!-- 웹용 테이블 -->
                 <div class="users-table">
                     <table>
                         <thead>
@@ -542,10 +874,16 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- 모바일용 카드 -->
+                <div class="cards-container" id="basic-cards">
+                    <!-- 동적으로 생성됨 -->
+                </div>
             </div>
 
             <!-- IP 정보 탭 -->
             <div id="ip-tab" class="tab-content">
+                <!-- 웹용 테이블 -->
                 <div class="users-table">
                     <table>
                         <thead>
@@ -565,10 +903,16 @@
                         </tbody>
                     </table>
                 </div>
+
+                <!-- 모바일용 카드 -->
+                <div class="cards-container" id="ip-cards">
+                    <!-- 동적으로 생성됨 -->
+                </div>
             </div>
 
             <!-- 일정 정보 탭 -->
             <div id="schedule-tab" class="tab-content">
+                <!-- 웹용 테이블 -->
                 <div class="users-table">
                     <table>
                         <thead>
@@ -588,6 +932,11 @@
                             </tr>
                         </tbody>
                     </table>
+                </div>
+
+                <!-- 모바일용 카드 -->
+                <div class="cards-container" id="schedule-cards">
+                    <!-- 동적으로 생성됨 -->
                 </div>
             </div>
         </div>
@@ -609,11 +958,9 @@
             appId: "1:994254528568:web:6a57d9c80a230331db46cd"
         };
 
-        // Firebase 초기화
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const db = firebase.firestore();
-
+        // 전역 변수 선언
+        let auth;
+        let db;
         let currentFilter = 'all';
         let allUsers = [];
         let currentTab = 'basic';
@@ -623,6 +970,27 @@
             'admin@coldhawk.com',
             'ppylgr@gmail.com'  // 관리자 이메일 추가
         ];
+
+        // Firebase 스크립트 로드 후 초기화
+        window.addEventListener('load', function() {
+            // Firebase 초기화
+            firebase.initializeApp(firebaseConfig);
+            auth = firebase.auth();
+            db = firebase.firestore();
+
+            // 로그인 상태 확인
+            auth.onAuthStateChanged(user => {
+                if (user && ADMIN_EMAILS.includes(user.email)) {
+                    document.getElementById('login-container').style.display = 'none';
+                    document.getElementById('admin-panel').style.display = 'block';
+                    loadUsers();
+                } else {
+                    // 로그인하지 않았거나 관리자가 아니면 로그인 화면만 표시
+                    document.getElementById('login-container').style.display = 'block';
+                    document.getElementById('admin-panel').style.display = 'none';
+                }
+            });
+        });
 
         // 로그인
         document.getElementById('login-form').addEventListener('submit', async (e) => {
@@ -702,6 +1070,11 @@
             document.getElementById('approved-users').textContent = allUsers.filter(u => u.status === 'approved').length;
             document.getElementById('suspended-users').textContent = allUsers.filter(u => u.status === 'suspended').length;
             document.getElementById('rejected-users').textContent = allUsers.filter(u => u.status === 'rejected').length;
+
+            // 모바일용 통계 요약
+            document.getElementById('m-total').textContent = allUsers.length;
+            document.getElementById('m-pending').textContent = allUsers.filter(u => u.status === 'pending').length;
+            document.getElementById('m-approved').textContent = allUsers.filter(u => u.status === 'approved').length;
         }
 
         // 탭 전환
@@ -746,6 +1119,9 @@
                 document.getElementById('basic-tbody').innerHTML = emptyMsg;
                 document.getElementById('ip-tbody').innerHTML = emptyMsg;
                 document.getElementById('schedule-tbody').innerHTML = emptyMsg;
+                document.getElementById('basic-cards').innerHTML = '';
+                document.getElementById('ip-cards').innerHTML = '';
+                document.getElementById('schedule-cards').innerHTML = '';
                 return;
             }
 
@@ -800,12 +1176,73 @@
                 `;
             }).join('');
 
-            // IP 정보 탭
-            document.getElementById('ip-tbody').innerHTML = filteredUsers.map((user, index) => {
-                // 전체 사용자 목록에서의 실제 인덱스 찾기
+            // 기본 정보 카드 (모바일)
+            document.getElementById('basic-cards').innerHTML = filteredUsers.map((user, index) => {
                 const actualIndex = sortedAllUsers.findIndex(u => u.id === user.id);
                 
-                // IP 비교 로직
+                let ipComparison = '';
+                if (user.signupIP === 'unknown' || user.lastLoginIP === 'N/A') {
+                    ipComparison = '<span style="color: #999;">-</span>';
+                } else if (user.signupIP === user.lastLoginIP) {
+                    ipComparison = '<span style="color: #28a745; font-weight: bold;">같음</span>';
+                } else {
+                    ipComparison = '<span style="color: #dc3545; font-weight: bold;">다름</span>';
+                }
+                
+                let expiryDisplay = '-';
+                let daysRemaining = null;
+                if (user.expiryDate) {
+                    const expiryTime = new Date(user.expiryDate);
+                    const now = new Date();
+                    daysRemaining = Math.ceil((expiryTime - now) / (1000 * 60 * 60 * 24));
+                    
+                    if (daysRemaining < 0) {
+                        expiryDisplay = '<span style="color: red; font-weight: bold;">만료</span>';
+                    } else if (daysRemaining <= 7) {
+                        expiryDisplay = `<span style="color: orange; font-weight: bold;">${daysRemaining}일</span>`;
+                    } else {
+                        expiryDisplay = `<span style="color: #666;">${daysRemaining}일</span>`;
+                    }
+                }
+
+                return `
+                <div class="user-card">
+                    <div class="card-header">
+                        <span class="card-number">#${totalCount - actualIndex}</span>
+                        <span class="card-email">${user.email}</span>
+                        <span class="card-nickname">${user.nickname || '-'}</span>
+                        <span class="card-toggle-icon">▼</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-row">
+                            <span class="card-label">상태</span>
+                            <span class="card-value"><span class="card-status status ${user.status}">${getStatusText(user.status)}</span></span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">IP비교</span>
+                            <span class="card-value">${ipComparison}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">만료일</span>
+                            <span class="card-value">${expiryDisplay}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        ${user.status === 'suspended' 
+                            ? `<button class="card-btn card-approve-btn" onclick="reactivateUser('${user.id}')">재활성화</button>` 
+                            : user.status !== 'approved' 
+                                ? `<button class="card-btn card-approve-btn" onclick="approveUser('${user.id}')">승인</button>` 
+                                : `<button class="card-btn card-approve-btn" onclick="editExpiry('${user.id}', ${user.expiryDate || 'null'})">만료일 수정</button>`}
+                        ${user.status !== 'suspended' && user.status !== 'rejected' ? `<button class="card-btn card-reject-btn" onclick="deactivateUser('${user.id}')">일시정지</button>` : ''}
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            // IP 정보 탭
+            document.getElementById('ip-tbody').innerHTML = filteredUsers.map((user, index) => {
+                const actualIndex = sortedAllUsers.findIndex(u => u.id === user.id);
+                
                 let ipComparison = '';
                 if (user.signupIP === 'unknown' || user.lastLoginIP === 'N/A') {
                     ipComparison = '<span style="color: #999;">-</span>';
@@ -827,12 +1264,49 @@
                 `;
             }).join('');
 
-            // 일정 정보 탭
-            document.getElementById('schedule-tbody').innerHTML = filteredUsers.map((user, index) => {
-                // 전체 사용자 목록에서의 실제 인덱스 찾기
+            // IP 정보 카드 (모바일)
+            document.getElementById('ip-cards').innerHTML = filteredUsers.map((user, index) => {
                 const actualIndex = sortedAllUsers.findIndex(u => u.id === user.id);
                 
-                // 만료일 표시 및 자동 일시정지 체크
+                let ipComparison = '';
+                if (user.signupIP === 'unknown' || user.lastLoginIP === 'N/A') {
+                    ipComparison = '<span style="color: #999;">-</span>';
+                } else if (user.signupIP === user.lastLoginIP) {
+                    ipComparison = '<span style="color: #28a745; font-weight: bold;">같음</span>';
+                } else {
+                    ipComparison = '<span style="color: #dc3545; font-weight: bold;">다름</span>';
+                }
+
+                return `
+                <div class="user-card">
+                    <div class="card-header">
+                        <span class="card-number">#${totalCount - actualIndex}</span>
+                        <span class="card-email">${user.email}</span>
+                        <span class="card-nickname">${user.nickname || '-'}</span>
+                        <span class="card-toggle-icon">▼</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-row">
+                            <span class="card-label">가입 IP</span>
+                            <span class="card-value" style="font-family: monospace; font-size: 12px;">${user.signupIP || 'unknown'}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">로그인 IP</span>
+                            <span class="card-value" style="font-family: monospace; font-size: 12px;">${user.lastLoginIP || 'N/A'}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">IP 비교</span>
+                            <span class="card-value">${ipComparison}</span>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            // 일정 정보 탭
+            document.getElementById('schedule-tbody').innerHTML = filteredUsers.map((user, index) => {
+                const actualIndex = sortedAllUsers.findIndex(u => u.id === user.id);
+                
                 let expiryDisplay = '-';
                 let isExpired = false;
                 if (user.expiryDate) {
@@ -840,7 +1314,6 @@
                     const now = new Date();
                     isExpired = now > expiryTime;
                     
-                    // 남은 일수 계산
                     const daysRemaining = Math.ceil((expiryTime - now) / (1000 * 60 * 60 * 24));
                     
                     let statusText = '';
@@ -874,6 +1347,89 @@
                 </tr>
                 `;
             }).join('');
+
+            // 일정 정보 카드 (모바일)
+            document.getElementById('schedule-cards').innerHTML = filteredUsers.map((user, index) => {
+                const actualIndex = sortedAllUsers.findIndex(u => u.id === user.id);
+                
+                let expiryDisplay = '-';
+                let isExpired = false;
+                if (user.expiryDate) {
+                    const expiryTime = new Date(user.expiryDate);
+                    const now = new Date();
+                    isExpired = now > expiryTime;
+                    
+                    const daysRemaining = Math.ceil((expiryTime - now) / (1000 * 60 * 60 * 24));
+                    
+                    if (isExpired) {
+                        expiryDisplay = '<span style="color: red; font-weight: bold;">만료</span>';
+                    } else if (daysRemaining <= 7) {
+                        expiryDisplay = `<span style="color: orange; font-weight: bold;">${daysRemaining}일 남음</span>`;
+                    } else {
+                        expiryDisplay = `<span style="color: #666;">${daysRemaining}일 남음</span>`;
+                    }
+                    
+                    if (isExpired && user.status === 'approved') {
+                        autoSuspendUser(user.id);
+                    }
+                }
+
+                return `
+                <div class="user-card">
+                    <div class="card-header">
+                        <span class="card-number">#${totalCount - actualIndex}</span>
+                        <span class="card-email">${user.email}</span>
+                        <span class="card-nickname">${user.nickname || '-'}</span>
+                        <span class="card-toggle-icon">▼</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="card-row">
+                            <span class="card-label">가입일</span>
+                            <span class="card-value">${formatDate(user.createdAt)}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">최근 로그인</span>
+                            <span class="card-value">${formatDate(user.lastLogin)}</span>
+                        </div>
+                        <div class="card-row">
+                            <span class="card-label">만료일</span>
+                            <span class="card-value">${expiryDisplay}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="card-btn card-approve-btn" onclick="editExpiry('${user.id}', ${user.expiryDate || 'null'})" style="flex: 1;">만료일 수정</button>
+                    </div>
+                </div>
+                `;
+            }).join('');
+
+            // 카드 아코디언 기능 활성화
+            setupCardToggle();
+        }
+
+        // 카드 아코디언 토글 기능
+        function setupCardToggle() {
+            const cards = document.querySelectorAll('.user-card');
+            cards.forEach(card => {
+                const header = card.querySelector('.card-header');
+                if (header) {
+                    // 기존 리스너 제거
+                    header.removeEventListener('click', toggleCard);
+                    // 새로운 리스너 추가
+                    header.addEventListener('click', toggleCard);
+                }
+                // 모든 카드는 기본적으로 펼쳐진 상태
+                card.classList.remove('collapsed');
+            });
+        }
+
+        function toggleCard(e) {
+            // 버튼 클릭은 무시
+            if (e.target.closest('button') || e.target.closest('.card-footer')) {
+                return;
+            }
+            const card = this.closest('.user-card');
+            card.classList.toggle('collapsed');
         }
 
         // 타임스탬프 추출
@@ -1187,18 +1743,6 @@
             }
         }
 
-        // 로그인 상태 확인
-        auth.onAuthStateChanged(user => {
-            if (user && ADMIN_EMAILS.includes(user.email)) {
-                document.getElementById('login-container').style.display = 'none';
-                document.getElementById('admin-panel').style.display = 'block';
-                loadUsers();
-            } else {
-                // 로그인하지 않았거나 관리자가 아니면 로그인 화면만 표시
-                document.getElementById('login-container').style.display = 'block';
-                document.getElementById('admin-panel').style.display = 'none';
-            }
-        });
     </script>
 </body>
 </html>
