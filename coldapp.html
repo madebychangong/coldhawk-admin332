@@ -675,11 +675,13 @@
                         nickname: data.nickname || '',
                         status: data.status || 'pending',
                         createdAt: data.createdAt || null,
-                        lastLogin: data.lastLogin || null,
+                        // 로그인 시간: 여러 필드 체크
+                        lastLogin: data.last_login_time || data.lastLogin || data.lastLoginAt || null,
                         lastLoginAt: data.lastLoginAt || null,
                         expiryDate: data.expiryDate || null,
                         signupIP: data.signupIP || 'unknown',
-                        lastLoginIP: data.lastLoginIP || 'N/A'
+                        // IP 주소: 여러 필드 체크 (ColdAPP 앱용 + 웹용)
+                        lastLoginIP: data.last_login_ip || data.lastLoginIP || 'N/A'
                     });
                 });
 
