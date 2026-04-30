@@ -147,6 +147,25 @@
             color: rgba(255, 255, 255, 0.9);
         }
 
+        .time-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #0f766e 0%, #22c55e 100%);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 900;
+            transition: transform 0.4s ease;
+        }
+
+        .card:hover .time-icon {
+            transform: scale(1.1);
+        }
+
         @media (max-width: 768px) {
             .title-container {
                 flex-direction: column;
@@ -211,6 +230,14 @@
                     <img src="images/coldapp_icon_256x256.png" class="card-icon" alt="ColdAPP">
                     <h2 class="card-title">ColdAPP</h2>
                     <p class="card-description">ColdAPP 관리자 페이지로 이동합니다</p>
+                </div>
+            </a>
+
+            <a href="time.html" class="card">
+                <div class="card-content">
+                    <div class="time-icon">Time</div>
+                    <h2 class="card-title">Time</h2>
+                    <p class="card-description">Time 라이선스 관리자 페이지로 이동합니다</p>
                 </div>
             </a>
         </div>
