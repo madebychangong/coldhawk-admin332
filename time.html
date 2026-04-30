@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Time - 라이선스 관리자</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #0f766e 0%, #1e293b 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1e293b;
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .header,
+        .login-container,
+        .panel,
+        .stat-card,
+        .table-wrap {
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            padding: 24px 32px;
+            margin-bottom: 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header h1 {
+            color: #0f766e;
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .login-container {
+            max-width: 450px;
+            margin: 100px auto;
+            padding: 44px 38px;
+        }
+
+        .login-container h2 {
+            color: #0f766e;
+            margin-bottom: 32px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #334155;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 13px 14px;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 15px;
+            background: #f8fafc;
+            transition: all 0.2s ease;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 46px;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #0f766e;
+            background: #fff;
+            box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+        }
+
+        button {
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 800;
+            transition: all 0.2s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, #0f766e 0%, #22c55e 100%);
+            color: #fff;
+            padding: 13px 18px;
+            box-shadow: 0 4px 16px rgba(15, 118, 110, 0.25);
+        }
+
+        .secondary-btn {
+            background: #f1f5f9;
+            color: #0f766e;
+            padding: 12px 16px;
+            border: 1px solid #cbd5e1;
+        }
+
+        .danger-btn {
+            background: #ef4444;
+            color: #fff;
+            padding: 8px 12px;
+        }
+
+        .small-btn {
+            padding: 8px 10px;
+            font-size: 12px;
+            margin: 2px;
+            white-space: nowrap;
+        }
+
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 14px 16px;
+            border-radius: 10px;
+            margin-bottom: 18px;
+            display: none;
+            font-weight: 700;
+        }
+
+        #admin-panel {
+            display: none;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 18px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            padding: 22px 18px;
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #0f766e;
+            font-size: 34px;
+            margin-bottom: 8px;
+        }
+
+        .stat-card p {
+            color: #64748b;
+            font-weight: 700;
+        }
+
+        .panel {
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .panel-title {
+            color: #0f766e;
+            font-size: 20px;
+            margin-bottom: 18px;
+            font-weight: 800;
+        }
+
+        .license-form {
+            display: grid;
+            grid-template-columns: minmax(160px, 1fr) minmax(160px, 1fr) 160px minmax(220px, 2fr) 130px;
+            gap: 14px;
+            align-items: end;
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: minmax(220px, 1fr) 180px 130px;
+            gap: 12px;
+            align-items: end;
+        }
+
+        .table-wrap {
+            padding: 24px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        th {
+            background: #f1f5f9;
+            color: #334155;
+            padding: 14px 12px;
+            border-bottom: 3px solid #0f766e;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 13px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        td.left {
+            text-align: left;
+        }
+
+        .mono {
+            font-family: Consolas, Menlo, monospace;
+            font-size: 12px;
+            word-break: break-all;
+        }
+
+        .status {
+            display: inline-block;
+            min-width: 70px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .status.active {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .status.inactive {
+            background: #e0f2fe;
+            color: #075985;
+        }
+
+        .status.banned {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .status.expired {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .empty-row {
+            color: #94a3b8;
+            font-weight: 700;
+            padding: 30px;
+        }
+
+        @media (max-width: 900px) {
+            .header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .license-form,
+            .filters {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="login-container" class="login-container">
+        <h2>Time 관리자 로그인</h2>
+        <div id="login-error" class="error-message"></div>
+        <form id="login-form">
+            <div class="form-group">
+                <label for="admin-email">이메일</label>
+                <input type="email" id="admin-email" autocomplete="username" required>
+            </div>
+            <div class="form-group">
+                <label for="admin-password">비밀번호</label>
+                <input type="password" id="admin-password" autocomplete="current-password" required>
+            </div>
+            <button type="submit" class="primary-btn" style="width: 100%;">로그인</button>
+        </form>
+    </div>
+
+    <div id="admin-panel">
+        <div class="container">
+            <div class="header">
+                <div>
+                    <h1>Time 라이선스 관리자</h1>
+                    <div id="admin-email-label" style="color: #64748b; margin-top: 6px; font-weight: 700;"></div>
+                </div>
+                <div class="header-actions">
+                    <a href="index.html" class="secondary-btn" style="text-decoration: none;">선택 화면</a>
+                    <button class="secondary-btn" onclick="loadLicenses()">새로고침</button>
+                    <button class="secondary-btn" onclick="logout()">로그아웃</button>
+                </div>
+            </div>
+
+            <div class="stats">
+                <div class="stat-card">
+                    <h3 id="stat-total">0</h3>
+                    <p>전체</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-active">0</h3>
+                    <p>사용 가능</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-expired">0</h3>
+                    <p>기간 만료</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-banned">0</h3>
+                    <p>정지</p>
+                </div>
+                <div class="stat-card">
+                    <h3 id="stat-inactive">0</h3>
+                    <p>승인 대기</p>
+                </div>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">차량번호로 라이선스 추가</div>
+                <form id="license-form" class="license-form">
+                    <div class="form-group">
+                        <label for="vehicle-no">차량번호</label>
+                        <input type="text" id="vehicle-no" placeholder="12가3456" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="user-label">사용자명</label>
+                        <input type="text" id="user-label" placeholder="홍길동">
+                    </div>
+                    <div class="form-group">
+                        <label for="expires-on">만료일</label>
+                        <input type="date" id="expires-on" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="memo">메모</label>
+                        <textarea id="memo" placeholder="내부 메모"></textarea>
+                    </div>
+                    <button type="submit" class="primary-btn">저장</button>
+                </form>
+            </div>
+
+            <div class="panel">
+                <div class="filters">
+                    <div class="form-group">
+                        <label for="search-input">검색</label>
+                        <input type="search" id="search-input" placeholder="차량번호, 사용자명, 메모, HWID">
+                    </div>
+                    <div class="form-group">
+                        <label for="status-filter">상태</label>
+                        <select id="status-filter">
+                            <option value="all">전체</option>
+                            <option value="active">사용 가능</option>
+                            <option value="expired">기간 만료</option>
+                            <option value="banned">정지</option>
+                            <option value="inactive">승인 대기</option>
+                        </select>
+                    </div>
+                    <button type="button" class="secondary-btn" onclick="clearFilters()">초기화</button>
+                </div>
+            </div>
+
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr>
+                            <th style="width: 60px;">번호</th>
+                            <th>차량번호</th>
+                            <th>사용자</th>
+                            <th>만료일</th>
+                            <th>남은 기간</th>
+                            <th>상태</th>
+                            <th>기기</th>
+                            <th>최근 확인</th>
+                            <th>앱</th>
+                            <th>메모</th>
+                            <th style="width: 260px;">관리</th>
+                        </tr>
+                    </thead>
+                    <tbody id="licenses-tbody">
+                        <tr><td colspan="11" class="empty-row">로딩 중...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAGtzZJeSbsnWAZ0MzMKk_Bhjgo9tOwdUY",
+            authDomain: "time-licenses.firebaseapp.com",
+            projectId: "time-licenses",
+            storageBucket: "time-licenses.firebasestorage.app",
+            messagingSenderId: "853502948979"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        const LICENSES_COLLECTION = 'licenses';
+        const ADMIN_COLLECTION = 'admins';
+
+        let allLicenses = [];
+
+        document.getElementById('login-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+
+            const email = document.getElementById('admin-email').value.trim();
+            const password = document.getElementById('admin-password').value;
+            const errorDiv = document.getElementById('login-error');
+            errorDiv.style.display = 'none';
+
+            try {
+                const credential = await auth.signInWithEmailAndPassword(email, password);
+                const isAdmin = await checkAdmin(credential.user);
+                if (!isAdmin) {
+                    await auth.signOut();
+                    showLoginError('관리자 권한이 없습니다. Firebase admins 문서를 확인해주세요.');
+                    return;
+                }
+                showAdmin(credential.user);
+                await loadLicenses();
+            } catch (error) {
+                showLoginError('로그인 실패: ' + error.message);
+            }
+        });
+
+        document.getElementById('license-form').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            await saveLicense();
+        });
+
+        document.getElementById('search-input').addEventListener('input', renderLicenses);
+        document.getElementById('status-filter').addEventListener('change', renderLicenses);
+
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                showLogin();
+                return;
+            }
+
+            try {
+                if (await checkAdmin(user)) {
+                    showAdmin(user);
+                    await loadLicenses();
+                } else {
+                    await auth.signOut();
+                    showLogin();
+                }
+            } catch (error) {
+                showLoginError('관리자 확인 실패: ' + error.message);
+            }
+        });
+
+        async function checkAdmin(user) {
+            if (!user) return false;
+            const doc = await db.collection(ADMIN_COLLECTION).doc(user.uid).get();
+            return doc.exists;
+        }
+
+        function showLoginError(message) {
+            const errorDiv = document.getElementById('login-error');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+        }
+
+        function showLogin() {
+            document.getElementById('login-container').style.display = 'block';
+            document.getElementById('admin-panel').style.display = 'none';
+        }
+
+        function showAdmin(user) {
+            document.getElementById('login-container').style.display = 'none';
+            document.getElementById('admin-panel').style.display = 'block';
+            document.getElementById('admin-email-label').textContent = user.email || '';
+        }
+
+        async function logout() {
+            await auth.signOut();
+            showLogin();
+        }
+
+        async function loadLicenses() {
+            const tbody = document.getElementById('licenses-tbody');
+            tbody.innerHTML = '<tr><td colspan="11" class="empty-row">로딩 중...</td></tr>';
+
+            try {
+                const snapshot = await db.collection(LICENSES_COLLECTION).get();
+                allLicenses = [];
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    allLicenses.push({
+                        id: doc.id,
+                        vehicleNo: data.vehicle_no || doc.id,
+                        userLabel: data.user_label || '',
+                        status: data.status || 'inactive',
+                        expiresOn: data.expires_on || '',
+                        memo: data.memo || '',
+                        boundHwid: data.bound_hwid || '',
+                        boundAt: data.bound_at || null,
+                        lastVerifiedAt: data.last_verified_at || null,
+                        lastSeenAppVersion: data.last_seen_app_version || '',
+                        createdAt: data.created_at || null,
+                        updatedAt: data.updated_at || null
+                    });
+                });
+                allLicenses.sort((a, b) => a.vehicleNo.localeCompare(b.vehicleNo, 'ko'));
+                updateStats();
+                renderLicenses();
+            } catch (error) {
+                tbody.innerHTML = `<tr><td colspan="11" class="empty-row">불러오기 실패: ${escapeHtml(error.message)}</td></tr>`;
+            }
+        }
+
+        async function saveLicense() {
+            const vehicleNo = normalizeVehicleNo(document.getElementById('vehicle-no').value);
+            const userLabel = document.getElementById('user-label').value.trim();
+            const expiresOn = document.getElementById('expires-on').value;
+            const memo = document.getElementById('memo').value.trim();
+
+            if (!vehicleNo) {
+                alert('차량번호를 입력해주세요.');
+                return;
+            }
+
+            if (!expiresOn) {
+                alert('만료일을 선택해주세요.');
+                return;
+            }
+
+            const docRef = db.collection(LICENSES_COLLECTION).doc(vehicleNo);
+            const existing = await docRef.get();
+            if (existing.exists && !confirm(`${vehicleNo} 라이선스가 이미 있습니다. 기존 정보를 수정할까요?`)) {
+                return;
+            }
+
+            const now = firebase.firestore.FieldValue.serverTimestamp();
+            const data = {
+                vehicle_no: vehicleNo,
+                user_label: userLabel,
+                status: 'active',
+                expires_on: expiresOn,
+                memo: memo,
+                updated_at: now,
+                updated_by: auth.currentUser.email
+            };
+
+            if (!existing.exists) {
+                data.created_at = now;
+                data.created_by = auth.currentUser.email;
+            }
+
+            try {
+                await docRef.set(data, { merge: true });
+                document.getElementById('license-form').reset();
+                alert(`${vehicleNo} 라이선스가 저장되었습니다.`);
+                await loadLicenses();
+            } catch (error) {
+                alert('저장 실패: ' + error.message);
+            }
+        }
+
+        function renderLicenses() {
+            const tbody = document.getElementById('licenses-tbody');
+            const keyword = document.getElementById('search-input').value.trim().toLowerCase();
+            const filter = document.getElementById('status-filter').value;
+
+            const rows = allLicenses.filter((license) => {
+                const calculatedStatus = effectiveStatus(license);
+                const statusOk = filter === 'all' || calculatedStatus === filter;
+                const text = [
+                    license.id,
+                    license.vehicleNo,
+                    license.userLabel,
+                    license.memo,
+                    license.boundHwid,
+                    license.status,
+                    license.expiresOn
+                ].join(' ').toLowerCase();
+                return statusOk && (!keyword || text.includes(keyword));
+            });
+
+            if (rows.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="11" class="empty-row">표시할 라이선스가 없습니다.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = rows.map((license, index) => {
+                const calculatedStatus = effectiveStatus(license);
+                const daysLeft = getDaysLeft(license.expiresOn);
+                const deviceText = license.boundHwid
+                    ? `<div class="mono">${escapeHtml(shortHwid(license.boundHwid))}</div><div style="color:#64748b;font-size:12px;">${formatDate(license.boundAt)}</div>`
+                    : '<span style="color:#94a3b8;font-weight:700;">미등록</span>';
+
+                return `
+                    <tr>
+                        <td>${rows.length - index}</td>
+                        <td class="left"><strong>${escapeHtml(license.vehicleNo)}</strong><div class="mono">${escapeHtml(license.id)}</div></td>
+                        <td>${escapeHtml(license.userLabel || '-')}</td>
+                        <td>${escapeHtml(license.expiresOn || '-')}</td>
+                        <td>${formatDaysLeft(daysLeft)}</td>
+                        <td><span class="status ${calculatedStatus}">${statusText(calculatedStatus)}</span></td>
+                        <td>${deviceText}</td>
+                        <td>${formatDate(license.lastVerifiedAt)}</td>
+                        <td>${escapeHtml(license.lastSeenAppVersion || '-')}</td>
+                        <td class="left">${escapeHtml(license.memo || '-')}</td>
+                        <td>
+                            <button class="secondary-btn small-btn" data-action="edit-expiry" data-id="${escapeAttr(license.id)}">만료일</button>
+                            <button class="secondary-btn small-btn" data-action="activate" data-id="${escapeAttr(license.id)}">활성</button>
+                            <button class="secondary-btn small-btn" data-action="inactive" data-id="${escapeAttr(license.id)}">대기</button>
+                            <button class="danger-btn small-btn" data-action="ban" data-id="${escapeAttr(license.id)}">정지</button>
+                            <button class="secondary-btn small-btn" data-action="reset-device" data-id="${escapeAttr(license.id)}">기기해제</button>
+                            <button class="secondary-btn small-btn" data-action="copy-build" data-id="${escapeAttr(license.id)}">빌드명령</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+
+            tbody.querySelectorAll('button[data-action]').forEach((button) => {
+                button.addEventListener('click', () => handleAction(button.dataset.action, button.dataset.id));
+            });
+        }
+
+        async function handleAction(action, id) {
+            if (action === 'edit-expiry') {
+                await editExpiry(id);
+            } else if (action === 'activate') {
+                await updateStatus(id, 'active');
+            } else if (action === 'inactive') {
+                await updateStatus(id, 'inactive');
+            } else if (action === 'ban') {
+                await updateStatus(id, 'banned');
+            } else if (action === 'reset-device') {
+                await resetDevice(id);
+            } else if (action === 'copy-build') {
+                await copyBuildCommand(id);
+            }
+        }
+
+        async function editExpiry(id) {
+            const license = allLicenses.find((item) => item.id === id);
+            const nextDate = prompt('새 만료일을 입력하세요. 예: 2026-05-31', license?.expiresOn || todayYmd());
+            if (nextDate === null) return;
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(nextDate.trim())) {
+                alert('YYYY-MM-DD 형식으로 입력해주세요.');
+                return;
+            }
+
+            await updateLicense(id, {
+                expires_on: nextDate.trim(),
+                updated_at: firebase.firestore.FieldValue.serverTimestamp(),
+                updated_by: auth.currentUser.email
+            }, '만료일이 수정되었습니다.');
+        }
+
+        async function updateStatus(id, status) {
+            const label = statusText(status);
+            if (status === 'banned' && !confirm(`${id} 라이선스를 정지할까요?`)) {
+                return;
+            }
+            await updateLicense(id, {
+                status: status,
+                updated_at: firebase.firestore.FieldValue.serverTimestamp(),
+                updated_by: auth.currentUser.email
+            }, `상태가 ${label}(으)로 변경되었습니다.`);
+        }
+
+        async function resetDevice(id) {
+            if (!confirm(`${id} 라이선스의 등록 기기를 해제할까요?\n다음 실행 기기에 다시 묶입니다.`)) {
+                return;
+            }
+
+            await updateLicense(id, {
+                bound_hwid: firebase.firestore.FieldValue.delete(),
+                bound_at: firebase.firestore.FieldValue.delete(),
+                reset_at: firebase.firestore.FieldValue.serverTimestamp(),
+                reset_by: auth.currentUser.email
+            }, '기기 등록이 해제되었습니다.');
+        }
+
+        async function updateLicense(id, data, successMessage) {
+            try {
+                await db.collection(LICENSES_COLLECTION).doc(id).update(data);
+                alert(successMessage);
+                await loadLicenses();
+            } catch (error) {
+                alert('수정 실패: ' + error.message);
+            }
+        }
+
+        async function copyBuildCommand(id) {
+            const license = allLicenses.find((item) => item.id === id);
+            const label = license?.userLabel || id;
+            const command = `.\\gradlew.bat assembleRelease -PLICENSE_TOKEN="${id}" -PUSER_LABEL="${label}"`;
+
+            try {
+                await navigator.clipboard.writeText(command);
+                alert('빌드 명령을 복사했습니다.\n' + command);
+            } catch (_) {
+                prompt('빌드 명령을 복사하세요.', command);
+            }
+        }
+
+        function updateStats() {
+            const statuses = allLicenses.map(effectiveStatus);
+            document.getElementById('stat-total').textContent = allLicenses.length;
+            document.getElementById('stat-active').textContent = statuses.filter((s) => s === 'active').length;
+            document.getElementById('stat-expired').textContent = statuses.filter((s) => s === 'expired').length;
+            document.getElementById('stat-banned').textContent = statuses.filter((s) => s === 'banned').length;
+            document.getElementById('stat-inactive').textContent = statuses.filter((s) => s === 'inactive').length;
+        }
+
+        function clearFilters() {
+            document.getElementById('search-input').value = '';
+            document.getElementById('status-filter').value = 'all';
+            renderLicenses();
+        }
+
+        function effectiveStatus(license) {
+            if (license.status === 'banned') return 'banned';
+            if (license.status !== 'active') return 'inactive';
+            const daysLeft = getDaysLeft(license.expiresOn);
+            return daysLeft !== null && daysLeft < 0 ? 'expired' : 'active';
+        }
+
+        function getDaysLeft(ymd) {
+            if (!/^\d{4}-\d{2}-\d{2}$/.test(ymd || '')) return null;
+            const expiry = new Date(`${ymd}T23:59:59+09:00`).getTime();
+            const now = Date.now();
+            return Math.ceil((expiry - now) / (1000 * 60 * 60 * 24));
+        }
+
+        function formatDaysLeft(daysLeft) {
+            if (daysLeft === null) return '-';
+            if (daysLeft < 0) return '<span style="color:#b91c1c;font-weight:900;">만료</span>';
+            if (daysLeft <= 3) return `<span style="color:#d97706;font-weight:900;">${daysLeft}일</span>`;
+            return `<span style="color:#166534;font-weight:900;">${daysLeft}일</span>`;
+        }
+
+        function statusText(status) {
+            const map = {
+                active: '사용 가능',
+                inactive: '승인 대기',
+                banned: '정지',
+                expired: '기간 만료'
+            };
+            return map[status] || status;
+        }
+
+        function formatDate(value) {
+            if (!value) return '-';
+            let date;
+            if (value.toDate) {
+                date = value.toDate();
+            } else if (typeof value === 'number') {
+                date = new Date(value);
+            } else {
+                date = new Date(value);
+            }
+            if (Number.isNaN(date.getTime())) return '-';
+            return date.toLocaleString('ko-KR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function todayYmd() {
+            const date = new Date();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${date.getFullYear()}-${month}-${day}`;
+        }
+
+        function normalizeVehicleNo(value) {
+            return value.replace(/\s+/g, '').trim();
+        }
+
+        function shortHwid(hwid) {
+            return hwid.length > 18 ? `${hwid.slice(0, 10)}...${hwid.slice(-8)}` : hwid;
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replaceAll('&', '&amp;')
+                .replaceAll('<', '&lt;')
+                .replaceAll('>', '&gt;')
+                .replaceAll('"', '&quot;')
+                .replaceAll("'", '&#039;');
+        }
+
+        function escapeAttr(value) {
+            return escapeHtml(value).replaceAll('`', '&#096;');
+        }
+    </script>
+</body>
+</html>
