@@ -686,6 +686,7 @@
                             <button class="secondary-btn small-btn" data-action="reset-device" data-id="${escapeAttr(license.id)}">기기해제</button>
                             ${legacyVehicleId ? `<button class="warn-btn small-btn" data-action="migrate-token" data-id="${escapeAttr(license.id)}">토큰전환</button>` : ''}
                             <button class="secondary-btn small-btn" data-action="copy-build" data-id="${escapeAttr(license.id)}">빌드명령</button>
+                            <button class="danger-btn small-btn" data-action="delete-license" data-id="${escapeAttr(license.id)}">삭제</button>
                         </td>
                     </tr>
                 `;
@@ -711,6 +712,8 @@
                 await migrateLegacyLicense(id);
             } else if (action === 'copy-build') {
                 await copyBuildCommand(id);
+            } else if (action === 'delete-license') {
+                await deleteLicense(id);
             }
         }
 
@@ -762,6 +765,29 @@
                 await loadLicenses();
             } catch (error) {
                 alert('수정 실패: ' + error.message);
+            }
+        }
+
+        async function deleteLicense(id) {
+            const license = allLicenses.find((item) => item.id === id);
+            if (!license) return;
+
+            const confirmText = prompt(
+                `${license.vehicleNo} 라이선스를 삭제합니다.\n삭제하면 해당 APK는 더 이상 인증할 수 없습니다.\n\n삭제하려면 차량번호를 그대로 입력하세요.`,
+                ''
+            );
+
+            if (normalizeVehicleNo(confirmText || '') !== normalizeVehicleNo(license.vehicleNo)) {
+                alert('삭제가 취소되었습니다.');
+                return;
+            }
+
+            try {
+                await db.collection(LICENSES_COLLECTION).doc(id).delete();
+                alert(`${license.vehicleNo} 라이선스가 삭제되었습니다.`);
+                await loadLicenses();
+            } catch (error) {
+                alert('삭제 실패: ' + error.message);
             }
         }
 
