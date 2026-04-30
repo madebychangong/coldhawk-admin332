@@ -839,7 +839,8 @@
 
             const token = license.token || id;
             const label = license?.userLabel || id;
-            const command = `.\\gradlew.bat assembleRelease -PLICENSE_TOKEN="${token}" -PUSER_LABEL="${label}"`;
+            const apkName = buildApkName(license);
+            const command = `.\\gradlew.bat assembleRelease -PLICENSE_TOKEN="${token}" -PUSER_LABEL="${label}" -PAPK_NAME="${apkName}"`;
 
             try {
                 await navigator.clipboard.writeText(command);
@@ -928,6 +929,28 @@
 
         function normalizeToken(value) {
             return value.replace(/\s+/g, '').trim();
+        }
+
+        function safeFileName(value) {
+            return (value || 'Time')
+                .trim()
+                .replace(/[\\/:*?"<>|]+/g, '_')
+                .replace(/\s+/g, '_')
+                .replace(/^[_\.]+|[_\.]+$/g, '') || 'Time';
+        }
+
+        function buildApkName(license) {
+            const base = safeFileName(license?.userLabel || license?.id || 'Time');
+            const sameNameLicenses = allLicenses
+                .filter((item) => safeFileName(item?.userLabel || item?.id || 'Time') === base)
+                .sort((a, b) => String(a.createdAt?.seconds || a.id).localeCompare(String(b.createdAt?.seconds || b.id)));
+
+            if (sameNameLicenses.length <= 1) {
+                return base;
+            }
+
+            const index = sameNameLicenses.findIndex((item) => item.id === license.id);
+            return `${base}_${index >= 0 ? index + 1 : sameNameLicenses.length + 1}`;
         }
 
         function isLegacyVehicleId(license) {
