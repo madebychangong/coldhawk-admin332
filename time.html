@@ -109,6 +109,22 @@
             box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
         }
 
+        .check-line {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 0;
+            color: #475569;
+            font-weight: 700;
+        }
+
+        .check-line input[type="checkbox"] {
+            width: auto;
+            padding: 0;
+            margin: 0;
+            accent-color: #0f766e;
+        }
+
         button {
             border: none;
             border-radius: 10px;
@@ -289,6 +305,25 @@
             color: #92400e;
         }
 
+        .account-badge {
+            display: inline-block;
+            margin-top: 5px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .account-badge.master {
+            background: #ede9fe;
+            color: #5b21b6;
+        }
+
+        .account-badge.normal {
+            background: #e0f2fe;
+            color: #075985;
+        }
+
         .empty-row {
             color: #94a3b8;
             font-weight: 700;
@@ -387,6 +422,13 @@
                     <div class="form-group">
                         <label for="memo">메모</label>
                         <textarea id="memo" placeholder="내부 메모"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="account-type">계정 유형</label>
+                        <select id="account-type">
+                            <option value="normal">일반 계정 - 카카오 차량번호/이름 확인</option>
+                            <option value="master">마스터/테스트 계정 - 기사정보 검증 제외</option>
+                        </select>
                     </div>
                     <button type="submit" class="primary-btn">저장</button>
                 </form>
@@ -559,6 +601,7 @@
                         status: data.status || 'inactive',
                         expiresOn: data.expires_on || '',
                         memo: data.memo || '',
+                        profileCheckRequired: data.profile_check_required !== false,
                         boundHwid: data.bound_hwid || '',
                         boundAt: data.bound_at || null,
                         lastVerifiedAt: data.last_verified_at || null,
@@ -581,6 +624,8 @@
             const userLabel = document.getElementById('user-label').value.trim();
             const expiresOn = document.getElementById('expires-on').value;
             const memo = document.getElementById('memo').value.trim();
+            const accountType = document.getElementById('account-type').value;
+            const profileCheckRequired = accountType !== 'master';
 
             if (!token) {
                 alert('APK 토큰을 생성해주세요.');
@@ -610,6 +655,7 @@
                 user_label: userLabel,
                 status: 'active',
                 expires_on: expiresOn,
+                profile_check_required: profileCheckRequired,
                 memo: memo,
                 updated_at: now,
                 updated_by: auth.currentUser.email
@@ -623,6 +669,7 @@
             try {
                 await docRef.set(data, { merge: true });
                 document.getElementById('license-form').reset();
+                document.getElementById('account-type').value = 'normal';
                 setGeneratedToken();
                 alert(`${vehicleNo} 라이선스가 저장되었습니다.\nAPK 토큰: ${token}`);
                 await loadLicenses();
@@ -646,7 +693,8 @@
                     license.memo,
                     license.boundHwid,
                     license.status,
-                    license.expiresOn
+                    license.expiresOn,
+                    license.profileCheckRequired ? '일반' : '마스터'
                 ].join(' ').toLowerCase();
                 return statusOk && (!keyword || text.includes(keyword));
             });
@@ -664,13 +712,18 @@
                 const deviceText = license.boundHwid
                     ? `<div class="mono">${escapeHtml(shortHwid(license.boundHwid))}</div><div style="color:#64748b;font-size:12px;">${formatDate(license.boundAt)}</div>`
                     : '<span style="color:#94a3b8;font-weight:700;">미등록</span>';
+                const accountBadge = license.profileCheckRequired
+                    ? '<div class="account-badge normal">일반</div>'
+                    : '<div class="account-badge master">마스터</div>';
+                const accountAction = license.profileCheckRequired ? 'set-master' : 'set-normal';
+                const accountButtonText = license.profileCheckRequired ? '마스터' : '일반';
 
                 return `
                     <tr>
                         <td>${rows.length - index}</td>
                         <td class="left"><strong>${escapeHtml(license.vehicleNo)}</strong>${legacyVehicleId ? '<div style="color:#d97706;font-size:12px;font-weight:900;">차량번호 문서 ID</div>' : ''}</td>
                         <td class="left"><div class="mono">${escapeHtml(token)}</div></td>
-                        <td>${escapeHtml(license.userLabel || '-')}</td>
+                        <td>${escapeHtml(license.userLabel || '-')}${accountBadge}</td>
                         <td>${escapeHtml(license.expiresOn || '-')}</td>
                         <td>${formatDaysLeft(daysLeft)}</td>
                         <td><span class="status ${calculatedStatus}">${statusText(calculatedStatus)}</span></td>
@@ -684,6 +737,7 @@
                             <button class="secondary-btn small-btn" data-action="inactive" data-id="${escapeAttr(license.id)}">대기</button>
                             <button class="danger-btn small-btn" data-action="ban" data-id="${escapeAttr(license.id)}">정지</button>
                             <button class="secondary-btn small-btn" data-action="reset-device" data-id="${escapeAttr(license.id)}">기기해제</button>
+                            <button class="secondary-btn small-btn" data-action="${accountAction}" data-id="${escapeAttr(license.id)}">${accountButtonText}</button>
                             ${legacyVehicleId ? `<button class="warn-btn small-btn" data-action="migrate-token" data-id="${escapeAttr(license.id)}">토큰전환</button>` : ''}
                             <button class="secondary-btn small-btn" data-action="copy-build" data-id="${escapeAttr(license.id)}">빌드명령</button>
                             <button class="danger-btn small-btn" data-action="delete-license" data-id="${escapeAttr(license.id)}">삭제</button>
@@ -708,6 +762,10 @@
                 await updateStatus(id, 'banned');
             } else if (action === 'reset-device') {
                 await resetDevice(id);
+            } else if (action === 'set-master') {
+                await updateAccountType(id, false);
+            } else if (action === 'set-normal') {
+                await updateAccountType(id, true);
             } else if (action === 'migrate-token') {
                 await migrateLegacyLicense(id);
             } else if (action === 'copy-build') {
@@ -743,6 +801,24 @@
                 updated_at: firebase.firestore.FieldValue.serverTimestamp(),
                 updated_by: auth.currentUser.email
             }, `상태가 ${label}(으)로 변경되었습니다.`);
+        }
+
+        async function updateAccountType(id, profileCheckRequired) {
+            const license = allLicenses.find((item) => item.id === id);
+            const nextType = profileCheckRequired ? '일반 계정' : '마스터/테스트 계정';
+            const detail = profileCheckRequired
+                ? '카카오 차량번호/이름 확인을 다시 사용합니다.'
+                : '카카오 차량번호/이름 확인만 제외합니다. 날짜/HWID/서명 검증은 유지됩니다.';
+
+            if (!confirm(`${license?.userLabel || id} 라이선스를 ${nextType}(으)로 변경할까요?\n${detail}`)) {
+                return;
+            }
+
+            await updateLicense(id, {
+                profile_check_required: profileCheckRequired,
+                updated_at: firebase.firestore.FieldValue.serverTimestamp(),
+                updated_by: auth.currentUser.email
+            }, `${nextType}(으)로 변경되었습니다.`);
         }
 
         async function resetDevice(id) {
