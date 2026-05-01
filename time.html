@@ -606,11 +606,14 @@
                         boundAt: data.bound_at || null,
                         lastVerifiedAt: data.last_verified_at || null,
                         lastSeenAppVersion: data.last_seen_app_version || '',
+                        apkName: data.apk_name || '',
+                        createdOrder: Number(data.created_order || 0),
                         createdAt: data.created_at || null,
                         updatedAt: data.updated_at || null
                     });
                 });
-                allLicenses.sort((a, b) => a.vehicleNo.localeCompare(b.vehicleNo, 'ko'));
+                assignCreatedOrder(allLicenses);
+                allLicenses.sort(compareCreatedDesc);
                 updateStats();
                 renderLicenses();
             } catch (error) {
@@ -649,6 +652,9 @@
             }
 
             const now = firebase.firestore.FieldValue.serverTimestamp();
+            const existingData = existing.exists ? existing.data() : {};
+            const createdOrder = Number(existingData.created_order || 0) || nextCreatedOrder();
+            const apkName = existingData.apk_name || nextApkNameForLabel(userLabel || vehicleNo || token);
             const data = {
                 license_token: token,
                 vehicle_no: vehicleNo,
@@ -656,6 +662,8 @@
                 status: 'active',
                 expires_on: expiresOn,
                 profile_check_required: profileCheckRequired,
+                apk_name: apkName,
+                created_order: createdOrder,
                 memo: memo,
                 updated_at: now,
                 updated_by: auth.currentUser.email
@@ -720,7 +728,7 @@
 
                 return `
                     <tr>
-                        <td>${rows.length - index}</td>
+                        <td>${license.createdOrder || rows.length - index}</td>
                         <td class="left"><strong>${escapeHtml(license.vehicleNo)}</strong>${legacyVehicleId ? '<div style="color:#d97706;font-size:12px;font-weight:900;">차량번호 문서 ID</div>' : ''}</td>
                         <td class="left"><div class="mono">${escapeHtml(token)}</div></td>
                         <td>${escapeHtml(license.userLabel || '-')}${accountBadge}</td>
@@ -915,7 +923,7 @@
 
             const token = license.token || id;
             const label = license?.userLabel || id;
-            const apkName = buildApkName(license);
+            const apkName = license.apkName || buildApkName(license);
             const command = `.\\gradlew.bat assembleRelease -PLICENSE_TOKEN="${token}" -PUSER_LABEL="${label}" -PAPK_NAME="${apkName}"`;
 
             try {
@@ -1015,18 +1023,72 @@
                 .replace(/^[_\.]+|[_\.]+$/g, '') || 'Time';
         }
 
+        function timestampMillis(value) {
+            if (!value) return 0;
+            if (typeof value.toMillis === 'function') return value.toMillis();
+            if (typeof value.seconds === 'number') {
+                return value.seconds * 1000 + Math.floor((value.nanoseconds || 0) / 1000000);
+            }
+            const parsed = Date.parse(value);
+            return Number.isNaN(parsed) ? 0 : parsed;
+        }
+
+        function compareCreatedAsc(a, b) {
+            const diff = timestampMillis(a.createdAt) - timestampMillis(b.createdAt);
+            if (diff !== 0) return diff;
+            const orderDiff = Number(a.createdOrder || 0) - Number(b.createdOrder || 0);
+            if (orderDiff !== 0) return orderDiff;
+            return String(a.id).localeCompare(String(b.id), 'ko');
+        }
+
+        function compareCreatedDesc(a, b) {
+            return compareCreatedAsc(b, a);
+        }
+
+        function assignCreatedOrder(list) {
+            const ordered = [...list].sort(compareCreatedAsc);
+            let next = Math.max(0, ...ordered.map((item) => Number(item.createdOrder || 0)));
+            ordered.forEach((item) => {
+                if (!Number(item.createdOrder || 0)) {
+                    next += 1;
+                    item.createdOrder = next;
+                }
+            });
+        }
+
+        function nextCreatedOrder() {
+            return Math.max(0, ...allLicenses.map((item) => Number(item.createdOrder || 0))) + 1;
+        }
+
+        function nextApkNameForLabel(value) {
+            const base = safeFileName(value || 'Time');
+            const usedNames = new Set(
+                allLicenses.map((item) => safeFileName(item.apkName || buildApkName(item)))
+            );
+            if (!usedNames.has(base)) return base;
+
+            let suffix = 2;
+            while (usedNames.has(`${base}_${suffix}`)) {
+                suffix += 1;
+            }
+            return `${base}_${suffix}`;
+        }
+
         function buildApkName(license) {
+            if (license?.apkName) {
+                return safeFileName(license.apkName);
+            }
             const base = safeFileName(license?.userLabel || license?.id || 'Time');
             const sameNameLicenses = allLicenses
                 .filter((item) => safeFileName(item?.userLabel || item?.id || 'Time') === base)
-                .sort((a, b) => String(a.createdAt?.seconds || a.id).localeCompare(String(b.createdAt?.seconds || b.id)));
+                .sort(compareCreatedAsc);
 
             if (sameNameLicenses.length <= 1) {
                 return base;
             }
 
             const index = sameNameLicenses.findIndex((item) => item.id === license.id);
-            return `${base}_${index >= 0 ? index + 1 : sameNameLicenses.length + 1}`;
+            return index <= 0 ? base : `${base}_${index + 1}`;
         }
 
         function isLegacyVehicleId(license) {
