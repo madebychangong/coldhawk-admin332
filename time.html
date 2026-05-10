@@ -499,6 +499,8 @@
 
         const LICENSES_COLLECTION = 'licenses';
         const ADMIN_COLLECTION = 'admins';
+        const PROJECT_DIR = 'C:\\Users\\changong\\Desktop\\22\\DarkRPG';
+        const DELIVERY_BUILD_SCRIPT = '.\\build_delivery_release.bat';
 
         let allLicenses = [];
 
@@ -912,6 +914,18 @@
             }
         }
 
+        function buildDeliveryCommand(license) {
+            const token = license.token || license.id;
+            const label = license?.userLabel || license.vehicleNo || license.id;
+            const apkName = license.apkName || buildApkName(license);
+
+            return `cd /d ${cmdArg(PROJECT_DIR)} && ${DELIVERY_BUILD_SCRIPT} ${cmdArg(token)} ${cmdArg(label)} ${cmdArg(apkName)}`;
+        }
+
+        function cmdArg(value) {
+            return `"${String(value || '').replaceAll('"', '').replaceAll('\r', '').replaceAll('\n', '')}"`;
+        }
+
         async function copyBuildCommand(id) {
             const license = allLicenses.find((item) => item.id === id);
             if (!license) return;
@@ -921,10 +935,7 @@
                 return;
             }
 
-            const token = license.token || id;
-            const label = license?.userLabel || id;
-            const apkName = license.apkName || buildApkName(license);
-            const command = `.\\gradlew.bat assembleRelease -PLICENSE_TOKEN="${token}" -PUSER_LABEL="${label}" -PAPK_NAME="${apkName}"`;
+            const command = buildDeliveryCommand(license);
 
             try {
                 await navigator.clipboard.writeText(command);
