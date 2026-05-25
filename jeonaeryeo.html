@@ -78,9 +78,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
 <script>
-  // 운영 API (저내려요.com). 통계 조회 키는 코드에 저장하지 않고 로그인 때 입력한 비밀번호만 메모리에서 사용.
+  // 운영 API (저내려요.com). Firebase 로그인 토큰으로 인증 (코드에 키 없음).
   var API = "https://xn--220b24l22mslb.com";
-  var currentAdminKey = "";
   var ADMIN_EMAILS = ["admin@coldhawk.com", "ppylgr@gmail.com"];
   var firebaseConfig = {
     apiKey: "AIzaSyAo2-_VoDQsNjRCimzns5V6boc6-ajP8zs",
@@ -92,6 +91,11 @@
   };
   firebase.initializeApp(firebaseConfig);
   var auth = firebase.auth();
+
+  // 새로고침해도 로그인 유지: 이미 관리자로 로그인돼 있으면 바로 대시보드
+  auth.onAuthStateChanged(function(user){
+    if(user && isAdminEmail(user.email)){ hide("login"); show("dash"); load(); }
+  });
 
   function fmt(n){ return (n==null?0:n).toLocaleString("ko-KR"); }
   function lineName(id){ var m=/^line(\d+)$/.exec(id||""); return m? m[1]+"호선" : (id||""); }
@@ -117,7 +121,6 @@
     hide("statsErr");
   }
   function logout(){
-    currentAdminKey = "";
     auth.signOut();
     hide("dash"); show("login");
     document.getElementById("adminPassword").value = "";
@@ -146,10 +149,13 @@
   }
 
   function load(){
-    var k = currentAdminKey;
-    if(!k){ hide("dash"); show("login"); return; }
+    var user = auth.currentUser;
+    if(!user){ hide("dash"); show("login"); return; }
     clearStatsError();
-    fetch(API + "/admin/stats", { headers: { "x-admin-key": k } })
+    user.getIdToken()
+      .then(function(token){
+        return fetch(API + "/admin/stats", { headers: { "Authorization": "Bearer " + token } });
+      })
       .then(function(res){
         if(res.status === 403){ throw new Error("forbidden"); }
         if(!res.ok){ throw new Error("error"); }
@@ -180,7 +186,6 @@
           auth.signOut();
           throw new Error("admin");
         }
-        currentAdminKey = password;
         hide("login");
         show("dash");
         load();
