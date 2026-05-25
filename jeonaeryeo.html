@@ -49,7 +49,7 @@
       <div class="code" style="color:var(--green)">ADMIN</div>
       <h1>저 내려요 · 관리자</h1>
     </div>
-    <p class="muted">관리자 아이디와 비밀번호로 로그인하세요.</p>
+    <p class="muted">관리자 아이디와 비밀번호를 입력하세요.</p>
     <form id="loginForm">
       <input id="adminEmail" type="email" placeholder="아이디" autocomplete="username" required />
       <input id="adminPassword" type="password" placeholder="비밀번호" autocomplete="current-password" required />
@@ -65,6 +65,7 @@
       <h1>운영 통계</h1>
       <div class="sub" id="updated"></div>
     </div>
+    <div id="statsErr" class="err hidden"></div>
     <div class="grid" id="metrics"></div>
     <div class="card"><h2>신고 사유별 누적</h2><div id="reasons"></div></div>
     <div class="card"><h2>노선별 현재 등록</h2><div id="byline"></div></div>
@@ -91,7 +92,6 @@
   };
   firebase.initializeApp(firebaseConfig);
   var auth = firebase.auth();
-  var persistenceReady = auth.setPersistence(firebase.auth.Auth.Persistence.NONE).catch(function(){});
 
   function fmt(n){ return (n==null?0:n).toLocaleString("ko-KR"); }
   function lineName(id){ var m=/^line(\d+)$/.exec(id||""); return m? m[1]+"호선" : (id||""); }
@@ -107,6 +107,14 @@
   }
   function isAdminEmail(email){
     return ADMIN_EMAILS.indexOf(String(email || "").toLowerCase()) >= 0;
+  }
+  function showStatsError(message){
+    document.getElementById("statsErr").textContent = message;
+    show("statsErr");
+  }
+  function clearStatsError(){
+    document.getElementById("statsErr").textContent = "";
+    hide("statsErr");
   }
   function logout(){
     currentAdminKey = "";
@@ -140,6 +148,7 @@
   function load(){
     var k = currentAdminKey;
     if(!k){ hide("dash"); show("login"); return; }
+    clearStatsError();
     fetch(API + "/admin/stats", { headers: { "x-admin-key": k } })
       .then(function(res){
         if(res.status === 403){ throw new Error("forbidden"); }
@@ -148,9 +157,13 @@
       })
       .then(function(d){ hide("login"); show("dash"); render(d); })
       .catch(function(e){
-        hide("dash"); show("login");
-        currentAdminKey = "";
-        if(String(e.message)==="forbidden"){ showLoginError("관리자 권한을 확인하지 못했습니다."); }
+        hide("login");
+        show("dash");
+        showStatsError(
+          String(e.message)==="forbidden"
+            ? "통계 조회 권한을 확인하지 못했습니다."
+            : "통계를 불러오지 못했습니다."
+        );
       });
   }
 
@@ -161,21 +174,25 @@
     var password = document.getElementById("adminPassword").value;
     if(!email || !password) return;
 
-    persistenceReady.then(function(){
-      return auth.signInWithEmailAndPassword(email, password);
-    })
+    auth.signInWithEmailAndPassword(email, password)
       .then(function(result){
         if(!result.user || !isAdminEmail(result.user.email)){
           auth.signOut();
           throw new Error("admin");
         }
         currentAdminKey = password;
+        hide("login");
+        show("dash");
         load();
       })
       .catch(function(error){
         currentAdminKey = "";
         hide("dash"); show("login");
-        showLoginError(error && error.message === "admin" ? "관리자 권한이 없습니다." : "로그인에 실패했습니다.");
+        showLoginError(
+          error && error.message === "admin"
+            ? "관리자 권한이 없습니다."
+            : "로그인 실패: " + (error && error.message ? error.message : "확인할 수 없는 오류")
+        );
       });
   });
 </script>
