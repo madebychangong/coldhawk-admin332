@@ -166,6 +166,25 @@
             transform: scale(1.1);
         }
 
+        .subway-icon {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 24px;
+            border-radius: 22px;
+            background: linear-gradient(135deg, #1f3a2e 0%, #2e7d52 100%);
+            color: #facc15;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: 900;
+            transition: transform 0.4s ease;
+        }
+
+        .card:hover .subway-icon {
+            transform: scale(1.1);
+        }
+
         @media (max-width: 768px) {
             .title-container {
                 flex-direction: column;
@@ -238,6 +257,14 @@
                     <div class="time-icon">Time</div>
                     <h2 class="card-title">Time</h2>
                     <p class="card-description">Time 라이선스 관리자 페이지로 이동합니다</p>
+                </div>
+            </a>
+
+            <a href="jeonaeryeo.html" class="card">
+                <div class="card-content">
+                    <div class="subway-icon">SUB</div>
+                    <h2 class="card-title">저 내려요</h2>
+                    <p class="card-description">저 내려요 운영 통계 관리자 페이지로 이동합니다</p>
                 </div>
             </a>
         </div>
