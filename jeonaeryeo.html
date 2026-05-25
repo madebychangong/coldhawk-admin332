@@ -1,0 +1,183 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="robots" content="noindex" />
+<title>저 내려요 · 관리자</title>
+<style>
+  :root { --bg:#f4f7f2; --panel:#fff; --panel2:#eef3ec; --ink:#17211d; --muted:#5b6b62;
+          --border:#d8e2da; --track:#1f3a2e; --green:#2e7d52; --amber:#d8a200; --accent:#e0533d; }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink);
+         font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Malgun Gothic",sans-serif; }
+  .wrap { max-width:760px; margin:0 auto; padding:18px; }
+  .header { background:var(--track); border-radius:14px; padding:20px; color:#fff; }
+  .header .code { color:var(--amber); font-size:12px; font-weight:800; }
+  .header h1 { margin:4px 0 0; font-size:24px; }
+  .header .sub { color:#dde8df; font-size:12px; margin-top:6px; }
+  .grid { display:flex; flex-wrap:wrap; gap:10px; margin-top:12px; }
+  .metric { flex:1 1 45%; background:var(--panel); border:1px solid var(--border);
+            border-radius:14px; padding:16px; }
+  .metric .v { font-size:26px; font-weight:800; }
+  .metric .l { color:var(--muted); font-size:12px; font-weight:700; margin-top:4px; }
+  .card { background:var(--panel); border:1px solid var(--border); border-radius:14px;
+          padding:16px; margin-top:12px; }
+  .card h2 { font-size:15px; margin:0 0 10px; }
+  .row { display:flex; justify-content:space-between; padding:8px 0; border-top:1px solid var(--border); }
+  .row .r { font-weight:800; }
+  .muted { color:var(--muted); font-size:13px; font-weight:700; }
+  .bar { display:flex; gap:8px; margin-top:14px; }
+  button { font-family:inherit; font-weight:800; border-radius:12px; border:1px solid var(--border);
+           padding:12px 16px; cursor:pointer; font-size:14px; }
+  button.primary { background:var(--accent); color:#fff; border-color:var(--accent); }
+  button.ghost { background:var(--panel2); color:var(--muted); }
+  input { width:100%; font-size:16px; padding:13px 14px; border:1px solid var(--border);
+          border-radius:12px; font-family:inherit; }
+  input + input { margin-top:10px; }
+  .login { max-width:360px; margin:60px auto; background:var(--panel); border:1px solid var(--border);
+           border-radius:14px; padding:22px; }
+  .login h1 { font-size:20px; margin:0 0 4px; }
+  .err { color:var(--accent); font-size:13px; font-weight:800; margin-top:10px; }
+  .hidden { display:none; }
+</style>
+</head>
+<body>
+  <!-- 로그인 -->
+  <div id="login" class="login">
+    <div class="header" style="margin-bottom:16px;background:none;color:var(--ink);padding:0;">
+      <div class="code" style="color:var(--green)">ADMIN</div>
+      <h1>저 내려요 · 관리자</h1>
+    </div>
+    <p class="muted">ColdHawk 관리자 아이디와 비밀번호로 로그인하세요.</p>
+    <form id="loginForm">
+      <input id="adminEmail" type="email" placeholder="아이디" autocomplete="username" required />
+      <input id="adminPassword" type="password" placeholder="비밀번호" autocomplete="current-password" required />
+      <div class="bar"><button class="primary" style="flex:1" type="submit">로그인</button></div>
+    </form>
+    <div id="loginErr" class="err hidden"></div>
+  </div>
+
+  <!-- 대시보드 -->
+  <div id="dash" class="wrap hidden">
+    <div class="header">
+      <div class="code">ADMIN</div>
+      <h1>운영 통계</h1>
+      <div class="sub" id="updated"></div>
+    </div>
+    <div class="grid" id="metrics"></div>
+    <div class="card"><h2>신고 사유별 누적</h2><div id="reasons"></div></div>
+    <div class="card"><h2>노선별 현재 등록</h2><div id="byline"></div></div>
+    <div class="bar">
+      <button class="ghost" style="flex:1" onclick="load()">새로고침</button>
+      <button class="ghost" style="flex:1" onclick="logout()">로그아웃</button>
+    </div>
+  </div>
+
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+<script>
+  // 운영 API (저내려요.com). 통계 조회 키는 코드에 저장하지 않고 로그인 때 입력한 비밀번호만 메모리에서 사용.
+  var API = "https://xn--220b24l22mslb.com";
+  var currentAdminKey = "";
+  var ADMIN_EMAILS = ["admin@coldhawk.com", "ppylgr@gmail.com"];
+  var firebaseConfig = {
+    apiKey: "AIzaSyAo2-_VoDQsNjRCimzns5V6boc6-ajP8zs",
+    authDomain: "coldhawk-id.firebaseapp.com",
+    projectId: "coldhawk-id",
+    storageBucket: "coldhawk-id.firebasestorage.app",
+    messagingSenderId: "994254528568",
+    appId: "1:994254528568:web:6a57d9c80a230331db46cd"
+  };
+  firebase.initializeApp(firebaseConfig);
+  var auth = firebase.auth();
+  var persistenceReady = auth.setPersistence(firebase.auth.Auth.Persistence.NONE).catch(function(){});
+
+  function fmt(n){ return (n==null?0:n).toLocaleString("ko-KR"); }
+  function lineName(id){ var m=/^line(\d+)$/.exec(id||""); return m? m[1]+"호선" : (id||""); }
+  function show(id){ document.getElementById(id).classList.remove("hidden"); }
+  function hide(id){ document.getElementById(id).classList.add("hidden"); }
+  function showLoginError(message){
+    document.getElementById("loginErr").textContent = message;
+    show("loginErr");
+  }
+  function clearLoginError(){
+    document.getElementById("loginErr").textContent = "";
+    hide("loginErr");
+  }
+  function isAdminEmail(email){
+    return ADMIN_EMAILS.indexOf(String(email || "").toLowerCase()) >= 0;
+  }
+  function logout(){
+    currentAdminKey = "";
+    auth.signOut();
+    hide("dash"); show("login");
+    document.getElementById("adminPassword").value = "";
+  }
+
+  function metric(v,l){ return '<div class="metric"><div class="v">'+v+'</div><div class="l">'+l+'</div></div>'; }
+  function rowHtml(left,right){ return '<div class="row"><span>'+left+'</span><span class="r">'+right+'</span></div>'; }
+
+  function render(d){
+    document.getElementById("metrics").innerHTML =
+      metric(fmt(d.totalHelps),"누적 도움") +
+      metric(fmt(d.activeDropoffs),"현재 등록된 좌석") +
+      metric(fmt(d.uniqueUsers),"순 사용자 수") +
+      metric(fmt(d.totalRegistrations),"총 등록 누적") +
+      metric(fmt(d.hiddenDropoffs),"신고로 숨겨진 등록");
+
+    document.getElementById("reasons").innerHTML = (d.reportReasons && d.reportReasons.length)
+      ? d.reportReasons.map(function(r){ return rowHtml(r.reason, fmt(r.count)); }).join("")
+      : '<div class="muted">아직 신고가 없습니다.</div>';
+
+    document.getElementById("byline").innerHTML = (d.byLine && d.byLine.length)
+      ? d.byLine.map(function(l){ return rowHtml(lineName(l.lineId), fmt(l.n)); }).join("")
+      : '<div class="muted">현재 등록된 좌석이 없습니다.</div>';
+
+    document.getElementById("updated").textContent = "업데이트: " + new Date(d.now).toLocaleString("ko-KR");
+  }
+
+  function load(){
+    var k = currentAdminKey;
+    if(!k){ hide("dash"); show("login"); return; }
+    fetch(API + "/admin/stats", { headers: { "x-admin-key": k } })
+      .then(function(res){
+        if(res.status === 403){ throw new Error("forbidden"); }
+        if(!res.ok){ throw new Error("error"); }
+        return res.json();
+      })
+      .then(function(d){ hide("login"); show("dash"); render(d); })
+      .catch(function(e){
+        hide("dash"); show("login");
+        currentAdminKey = "";
+        if(String(e.message)==="forbidden"){ showLoginError("관리자 권한을 확인하지 못했습니다."); }
+      });
+  }
+
+  document.getElementById("loginForm").addEventListener("submit", function(e){
+    e.preventDefault();
+    clearLoginError();
+    var email = document.getElementById("adminEmail").value.trim().toLowerCase();
+    var password = document.getElementById("adminPassword").value;
+    if(!email || !password) return;
+
+    persistenceReady.then(function(){
+      return auth.signInWithEmailAndPassword(email, password);
+    })
+      .then(function(result){
+        if(!result.user || !isAdminEmail(result.user.email)){
+          auth.signOut();
+          throw new Error("admin");
+        }
+        currentAdminKey = password;
+        load();
+      })
+      .catch(function(error){
+        currentAdminKey = "";
+        hide("dash"); show("login");
+        showLoginError(error && error.message === "admin" ? "관리자 권한이 없습니다." : "로그인에 실패했습니다.");
+      });
+  });
+</script>
+</body>
+</html>
