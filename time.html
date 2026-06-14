@@ -341,6 +341,48 @@
                 grid-template-columns: 1fr;
             }
         }
+
+        .tab-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.8);
+            color: #0f766e;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+            opacity: 0.7;
+        }
+
+        .tab-btn.active {
+            background: #fff;
+            opacity: 1;
+            box-shadow: 0 8px 24px rgba(15, 118, 110, 0.22);
+        }
+
+        .quick-range {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .range-btn {
+            background: #f1f5f9;
+            color: #0f766e;
+            border: 1px solid #cbd5e1;
+            padding: 8px 14px;
+            font-size: 13px;
+        }
+
+        .range-btn.active {
+            background: linear-gradient(135deg, #0f766e 0%, #22c55e 100%);
+            color: #fff;
+            border-color: transparent;
+        }
     </style>
 </head>
 <body>
@@ -374,6 +416,12 @@
                 </div>
             </div>
 
+            <div class="tab-nav">
+                <button class="tab-btn active" data-tab="manage" onclick="switchTab('manage')">관리</button>
+                <button class="tab-btn" data-tab="stats" onclick="switchTab('stats')">통계</button>
+            </div>
+
+            <div id="tab-manage" class="tab-content">
             <div class="stats">
                 <div class="stat-card">
                     <h3 id="stat-total">0</h3>
@@ -477,6 +525,72 @@
                     </tbody>
                 </table>
             </div>
+            </div><!-- /tab-manage -->
+
+            <div id="tab-stats" class="tab-content" style="display:none;">
+                <div class="panel">
+                    <div class="panel-title">예약 통계</div>
+                    <div class="filters" style="grid-template-columns: minmax(180px,1fr) 150px 150px 150px 120px;">
+                        <div class="form-group">
+                            <label for="stat-driver">기사</label>
+                            <select id="stat-driver"><option value="all">전체 기사</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label for="stat-from">시작일</label>
+                            <input type="date" id="stat-from">
+                        </div>
+                        <div class="form-group">
+                            <label for="stat-to">종료일</label>
+                            <input type="date" id="stat-to">
+                        </div>
+                        <div class="form-group">
+                            <label for="stat-view">보기</label>
+                            <select id="stat-view">
+                                <option value="list">전체 내역</option>
+                                <option value="driver">기사별 집계</option>
+                                <option value="day">일자별 집계</option>
+                            </select>
+                        </div>
+                        <button type="button" class="secondary-btn" onclick="clearStatFilters()">초기화</button>
+                    </div>
+                    <div style="margin-top:14px; display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                        <label style="margin:0;">기간</label>
+                        <div class="quick-range" id="quick-range">
+                            <button type="button" class="range-btn" data-months="1" onclick="setQuickRange(1, this)">최근 1개월</button>
+                            <button type="button" class="range-btn" data-months="3" onclick="setQuickRange(3, this)">최근 3개월</button>
+                            <button type="button" class="range-btn" data-months="6" onclick="setQuickRange(6, this)">최근 6개월</button>
+                            <button type="button" class="range-btn active" data-months="0" onclick="setQuickRange(0, this)">전체</button>
+                        </div>
+                        <label for="stat-month" style="margin:0;">월별</label>
+                        <select id="stat-month" style="width:auto;" onchange="onMonthSelect()">
+                            <option value="">월 선택</option>
+                        </select>
+                        <span style="width:1px; height:24px; background:#e2e8f0;"></span>
+                        <label for="stat-basis" style="margin:0;">기준</label>
+                        <select id="stat-basis" style="width:auto;">
+                            <option value="grabbed">잡은 시각</option>
+                            <option value="ride">운행 일시</option>
+                        </select>
+                        <button type="button" class="primary-btn" onclick="loadReservations()">불러오기</button>
+                    </div>
+                </div>
+
+                <div class="stats">
+                    <div class="stat-card"><h3 id="rstat-count">0</h3><p>예약 건수</p></div>
+                    <div class="stat-card"><h3 id="rstat-sum">0</h3><p>총 금액(원)</p></div>
+                    <div class="stat-card"><h3 id="rstat-avg">0</h3><p>평균 단가(원)</p></div>
+                    <div class="stat-card"><h3 id="rstat-drivers">0</h3><p>기사 수</p></div>
+                </div>
+
+                <div class="table-wrap">
+                    <table>
+                        <thead id="rstat-thead"></thead>
+                        <tbody id="rstat-tbody">
+                            <tr><td class="empty-row">「불러오기」를 눌러주세요.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div><!-- /tab-stats -->
         </div>
     </div>
 
@@ -499,7 +613,7 @@
 
         const LICENSES_COLLECTION = 'licenses';
         const ADMIN_COLLECTION = 'admins';
-        const PROJECT_DIR = 'C:\\Users\\changong\\Desktop\\22\\DarkRPG';
+        const PROJECT_DIR = 'C:\\Users\\changong\\Desktop\\22\\timeapp';
         const DELIVERY_BUILD_SCRIPT = '.\\build_delivery_release.bat';
 
         let allLicenses = [];
@@ -1135,6 +1249,292 @@
 
         function escapeAttr(value) {
             return escapeHtml(value).replaceAll('`', '&#096;');
+        }
+
+        // ===== 예약 통계 탭 =====
+        let allReservations = [];
+        let reservationsLoaded = false;
+
+        function switchTab(name) {
+            document.querySelectorAll('.tab-content').forEach((el) => {
+                el.style.display = (el.id === 'tab-' + name) ? 'block' : 'none';
+            });
+            document.querySelectorAll('.tab-btn').forEach((btn) => {
+                btn.classList.toggle('active', btn.dataset.tab === name);
+            });
+            if (name === 'stats') {
+                populateDriverFilter();
+                if (!reservationsLoaded) loadReservations();
+            }
+        }
+
+        function populateDriverFilter() {
+            const sel = document.getElementById('stat-driver');
+            const current = sel.value;
+            const opts = ['<option value="all">전체 기사</option>'];
+            allLicenses.slice().sort(compareCreatedDesc).forEach((lic) => {
+                const label = [lic.vehicleNo, lic.userLabel].filter(Boolean).join(' / ') || lic.token;
+                opts.push(`<option value="${escapeAttr(lic.token)}">${escapeHtml(label)}</option>`);
+            });
+            sel.innerHTML = opts.join('');
+            sel.value = current || 'all';
+        }
+
+        async function loadReservations() {
+            const thead = document.getElementById('rstat-thead');
+            const tbody = document.getElementById('rstat-tbody');
+            thead.innerHTML = '';
+            tbody.innerHTML = '<tr><td class="empty-row">불러오는 중...</td></tr>';
+            try {
+                const snapshot = await db.collection('reservations').get();
+                allReservations = [];
+                snapshot.forEach((doc) => {
+                    const d = doc.data();
+                    allReservations.push({
+                        id: doc.id,
+                        token: d.licenseToken || '',
+                        userLabel: d.userLabel || '',
+                        vehicleNo: d.vehicleNo || '',
+                        deviceId: d.deviceId || '',
+                        price: Number(d.price || 0),
+                        dateText: d.dateText || '',
+                        source: d.source || '',
+                        destination: d.destination || '',
+                        reservationTimeMillis: Number(d.reservationTimeMillis || 0),
+                        grabbedAtMillis: Number(d.grabbedAtMillis || 0)
+                    });
+                });
+                reservationsLoaded = true;
+                populateMonthFilter();
+                renderReservations();
+            } catch (error) {
+                thead.innerHTML = '';
+                tbody.innerHTML = `<tr><td class="empty-row">불러오기 실패: ${escapeHtml(error.message)}</td></tr>`;
+            }
+        }
+
+        // 데이터에 존재하는 월(YYYY-MM)을 드롭다운에 채움 (기간 기준 따라 달라짐)
+        function populateMonthFilter() {
+            const sel = document.getElementById('stat-month');
+            if (!sel) return;
+            const cur = sel.value;
+            const set = new Set();
+            allReservations.forEach((r) => {
+                const ms = statBasisMillis(r);
+                if (!ms) return;
+                const d = new Date(Number(ms));
+                if (isNaN(d.getTime())) return;
+                set.add(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`);
+            });
+            const months = [...set].sort((a, b) => b.localeCompare(a));
+            const opts = ['<option value="">월 선택</option>'];
+            months.forEach((m) => {
+                const [y, mm] = m.split('-');
+                opts.push(`<option value="${m}">${y}년 ${mm}월</option>`);
+            });
+            sel.innerHTML = opts.join('');
+            sel.value = months.includes(cur) ? cur : '';
+        }
+
+        // 월 선택 시 그 달 1일~말일로 기간 설정
+        function onMonthSelect() {
+            const m = document.getElementById('stat-month').value;
+            document.querySelectorAll('#quick-range .range-btn').forEach((b) => b.classList.remove('active'));
+            if (!m) {
+                renderReservations();
+                return;
+            }
+            const [y, mm] = m.split('-').map(Number);
+            const start = new Date(y, mm - 1, 1);
+            const end = new Date(y, mm, 0);
+            document.getElementById('stat-from').value = toDateInput(start);
+            document.getElementById('stat-to').value = toDateInput(end);
+            renderReservations();
+        }
+
+        ['stat-driver', 'stat-from', 'stat-to', 'stat-view', 'stat-basis'].forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', renderReservations);
+        });
+
+        function statBasisMillis(r) {
+            return document.getElementById('stat-basis').value === 'ride'
+                ? r.reservationTimeMillis
+                : r.grabbedAtMillis;
+        }
+
+        function renderReservations() {
+            const driver = document.getElementById('stat-driver').value;
+            const fromStr = document.getElementById('stat-from').value;
+            const toStr = document.getElementById('stat-to').value;
+            const view = document.getElementById('stat-view').value;
+            const fromMs = fromStr ? new Date(fromStr + 'T00:00:00').getTime() : null;
+            const toMs = toStr ? new Date(toStr + 'T23:59:59.999').getTime() : null;
+
+            const rows = allReservations.filter((r) => {
+                if (driver !== 'all' && r.token !== driver) return false;
+                const ms = statBasisMillis(r);
+                if (fromMs && ms && ms < fromMs) return false;
+                if (toMs && ms && ms > toMs) return false;
+                return true;
+            });
+
+            const count = rows.length;
+            const sum = rows.reduce((a, r) => a + r.price, 0);
+            const avg = count ? Math.round(sum / count) : 0;
+            const drivers = new Set(rows.map((r) => r.token || r.deviceId));
+            document.getElementById('rstat-count').textContent = count.toLocaleString();
+            document.getElementById('rstat-sum').textContent = sum.toLocaleString();
+            document.getElementById('rstat-avg').textContent = avg.toLocaleString();
+            document.getElementById('rstat-drivers').textContent = drivers.size.toLocaleString();
+
+            const thead = document.getElementById('rstat-thead');
+            const tbody = document.getElementById('rstat-tbody');
+            if (count === 0) {
+                thead.innerHTML = '';
+                tbody.innerHTML = '<tr><td class="empty-row">조건에 맞는 예약이 없습니다.</td></tr>';
+                return;
+            }
+            if (view === 'driver') renderStatByDriver(rows, thead, tbody);
+            else if (view === 'day') renderStatByDay(rows, thead, tbody);
+            else renderStatList(rows, thead, tbody);
+        }
+
+        function renderStatList(rows, thead, tbody) {
+            rows.sort((a, b) => statBasisMillis(b) - statBasisMillis(a));
+            thead.innerHTML = `<tr>
+                <th style="width:50px;">번호</th><th>기사</th><th>운행 일시</th>
+                <th>잡은 시각</th><th>출발</th><th>도착</th><th>가격</th></tr>`;
+            tbody.innerHTML = rows.map((r, i) => {
+                const who = [r.vehicleNo, r.userLabel].filter(Boolean).join(' / ') || shortHwid(r.deviceId);
+                return `<tr>
+                    <td>${i + 1}</td>
+                    <td>${escapeHtml(who)}</td>
+                    <td>${escapeHtml(r.dateText || formatMillis(r.reservationTimeMillis))}</td>
+                    <td>${escapeHtml(formatMillis(r.grabbedAtMillis))}</td>
+                    <td class="left">${escapeHtml(r.source)}</td>
+                    <td class="left">${escapeHtml(r.destination)}</td>
+                    <td>${r.price.toLocaleString()}원</td>
+                </tr>`;
+            }).join('');
+        }
+
+        function renderStatByDriver(rows, thead, tbody) {
+            const map = new Map();
+            rows.forEach((r) => {
+                const key = r.token || r.deviceId;
+                const who = [r.vehicleNo, r.userLabel].filter(Boolean).join(' / ') || shortHwid(r.deviceId);
+                const g = map.get(key) || { who, count: 0, sum: 0 };
+                g.count += 1; g.sum += r.price;
+                map.set(key, g);
+            });
+            const list = [...map.values()].sort((a, b) => b.sum - a.sum);
+            thead.innerHTML = `<tr><th style="width:50px;">번호</th><th>기사</th><th>건수</th><th>총 금액</th><th>평균 단가</th></tr>`;
+            tbody.innerHTML = list.map((g, i) => `<tr>
+                <td>${i + 1}</td>
+                <td>${escapeHtml(g.who)}</td>
+                <td>${g.count.toLocaleString()}</td>
+                <td>${g.sum.toLocaleString()}원</td>
+                <td>${Math.round(g.sum / g.count).toLocaleString()}원</td>
+            </tr>`).join('');
+        }
+
+        function renderStatByDay(rows, thead, tbody) {
+            const map = new Map();
+            rows.forEach((r) => {
+                const key = dayKey(statBasisMillis(r));
+                const g = map.get(key) || { count: 0, sum: 0 };
+                g.count += 1; g.sum += r.price;
+                map.set(key, g);
+            });
+            const list = [...map.entries()].sort((a, b) => b[0].localeCompare(a[0]));
+            thead.innerHTML = `<tr><th>날짜</th><th>건수</th><th>총 금액</th><th>평균 단가</th></tr>`;
+            tbody.innerHTML = list.map(([day, g]) => `<tr>
+                <td>${escapeHtml(day)}</td>
+                <td>${g.count.toLocaleString()}</td>
+                <td>${g.sum.toLocaleString()}원</td>
+                <td>${Math.round(g.sum / g.count).toLocaleString()}원</td>
+            </tr>`).join('');
+        }
+
+        function formatMillis(ms) {
+            if (!ms) return '-';
+            const d = new Date(Number(ms));
+            if (isNaN(d.getTime())) return '-';
+            return d.toLocaleString('ko-KR', {
+                year: '2-digit', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', hour12: false
+            });
+        }
+
+        function dayKey(ms) {
+            if (!ms) return '-';
+            const d = new Date(Number(ms));
+            if (isNaN(d.getTime())) return '-';
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        // 빠른 기간 선택 (months=0 이면 전체)
+        function setQuickRange(months, btn) {
+            const monthSel = document.getElementById('stat-month');
+            if (monthSel) monthSel.value = '';
+            document.querySelectorAll('#quick-range .range-btn').forEach((b) => {
+                b.classList.toggle('active', b === btn);
+            });
+            const toInput = document.getElementById('stat-from');
+            const endInput = document.getElementById('stat-to');
+            if (!months) {
+                toInput.value = '';
+                endInput.value = '';
+            } else {
+                const now = new Date();
+                const from = new Date();
+                from.setMonth(from.getMonth() - months);
+                toInput.value = toDateInput(from);
+                endInput.value = toDateInput(now);
+            }
+            renderReservations();
+        }
+
+        function toDateInput(d) {
+            const y = d.getFullYear();
+            const m = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${y}-${m}-${day}`;
+        }
+
+        // 시작/종료일을 직접 바꾸면 빠른버튼·월 선택 해제
+        ['stat-from', 'stat-to'].forEach((id) => {
+            const el = document.getElementById(id);
+            if (el) el.addEventListener('change', () => {
+                document.querySelectorAll('#quick-range .range-btn').forEach((b) => b.classList.remove('active'));
+                const monthSel = document.getElementById('stat-month');
+                if (monthSel) monthSel.value = '';
+            });
+        });
+
+        // 기간 기준(잡은시각/운행)이 바뀌면 월 목록 다시 채움
+        (function () {
+            const basis = document.getElementById('stat-basis');
+            if (basis) basis.addEventListener('change', populateMonthFilter);
+        })();
+
+        function clearStatFilters() {
+            document.getElementById('stat-driver').value = 'all';
+            document.getElementById('stat-from').value = '';
+            document.getElementById('stat-to').value = '';
+            document.getElementById('stat-view').value = 'list';
+            document.getElementById('stat-basis').value = 'grabbed';
+            const monthSel = document.getElementById('stat-month');
+            if (monthSel) monthSel.value = '';
+            document.querySelectorAll('#quick-range .range-btn').forEach((b) => {
+                b.classList.toggle('active', b.dataset.months === '0');
+            });
+            populateMonthFilter();
+            renderReservations();
         }
     </script>
 </body>
